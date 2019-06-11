@@ -1,0 +1,27 @@
+[core]
+    excludesfile = ~/.gitexclude
+[push]
+    default = simple
+
+[diff]
+    tool = diffmerge
+[difftool "diffmerge"]
+    cmd = "nvim -d $LOCAL $REMOTE"
+
+[merge]
+    tool = mergetool
+[mergetool]
+    keepBackup = false
+[mergetool "mergetool"]
+    cmd = nvim -d $LOCAL $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'
+
+[alias]
+    rb = rebase -i --autosquash
+    d = difftool
+    s = status
+    c = commit
+    pull = pull --prune --all
+
+    lg = !"git lg-light-bg --all"
+    lg-light-bg = log --graph --abbrev-commit --decorate --format=format:'%C(bold green)%h%C(reset) - %C(bold cyan)(%ar)%C(reset) %C(black)%s%C(reset) %C(dim black)- %an%C(reset)%C(auto)%d%C(reset)'
+    lg-dark-bg = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)'

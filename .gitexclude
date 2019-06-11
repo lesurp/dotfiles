@@ -1,0 +1,4 @@
+.clangd/
+*.swp
+*.pyc
+compile_commands.json
