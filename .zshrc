@@ -1,14 +1,28 @@
 ##### zsh conf
+# colorized man
+function man() {
+	env \
+		LESS_TERMCAP_mb=$(printf "\e[1;31m") \
+		LESS_TERMCAP_md=$(printf "\e[1;31m") \
+		LESS_TERMCAP_me=$(printf "\e[0m") \
+		LESS_TERMCAP_se=$(printf "\e[0m") \
+		LESS_TERMCAP_so=$(printf "\e[1;44;33m") \
+		LESS_TERMCAP_ue=$(printf "\e[0m") \
+		LESS_TERMCAP_us=$(printf "\e[1;32m") \
+		PAGER="${commands[less]:-$PAGER}" \
+		_NROFF_U=1 \
+		PATH="$HOME/bin:$PATH" \
+			man "$@"
+}
+
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
-COMPLETION_WAITING_DOTS="true"
-ZSH_THEME="pygmalion"
-plugins=(colored-man-pages zsh-autosuggestions)
+ZSH_THEME="pygmalion_custom"
+plugins=(zsh-autosuggestions)
 # binds the auto complete to alt+enter
 bindkey '^[' autosuggest-execute
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=2'
 # add custom completion scripts
-fpath=(~/.zsh/completion $fpath) 
 source $ZSH/oh-my-zsh.sh
 
 ### QoL / theming
