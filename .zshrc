@@ -3,7 +3,7 @@
 export ZSH=$HOME/.oh-my-zsh
 COMPLETION_WAITING_DOTS="true"
 ZSH_THEME="pygmalion"
-plugins=(git colored-man-pages zsh-autosuggestions)
+plugins=(colored-man-pages zsh-autosuggestions)
 # binds the auto complete to alt+enter
 bindkey '^[' autosuggest-execute
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=2'
@@ -13,6 +13,7 @@ source $ZSH/oh-my-zsh.sh
 
 ### QoL / theming
 alias v=nvim
+alias g=git
 alias icat="kitty +kitten icat" # display image in terminal
 alias d="nvim -d" # diff files
 alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME' # handle dotfiles
