@@ -17,7 +17,7 @@ function man() {
 
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
-ZSH_THEME="pygmalion_custom"
+ZSH_THEME="meine_theme"
 plugins=(zsh-autosuggestions)
 # binds the auto complete to alt+enter
 bindkey '^[' autosuggest-execute
