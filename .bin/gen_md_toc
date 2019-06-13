@@ -1,0 +1,21 @@
+#!/usr/bin/awk -f
+/^\s*#+/ {
+    indent=""
+    for(i=1; i<length($1); i++) {
+        indent=indent"    "
+    }
+
+    full_name=$2
+    href_name=$2
+    for(i=3; i<=NF; i++) {
+        full_name=full_name" "$i
+        href_name=href_name"-"$i
+    }
+
+    href_name=tolower(href_name)
+    gsub(/[^a-z0-9-]/, "", href_name)
+    # if a token is a single, filtered character, we get multiple dash
+    gsub(/-+/, "-", href_name) 
+
+    print indent "- ["full_name"](#"href_name")"
+}
