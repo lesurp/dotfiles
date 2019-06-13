@@ -1,0 +1,27 @@
+#!/bin/bash
+
+confirm() {
+    read -r -p "${1:-Are you sure? [Y/n]} " response
+    printf "\n\n"
+    case "$response" in
+        [nN]
+            false
+            ;;
+        *)
+            true
+            ;;
+    esac
+}
+
+function revisions() {
+    git rev-list $1..$2 
+}
+
+for rev in $(revisions $1 $2)
+do
+    git --no-pager show --quiet $rev
+    confirm "Do you want to diff this commit ?" || continue
+    git branch -a --contains $rev^1
+    git difftool $rev^1 $rev 
+    printf "\n\n"
+done

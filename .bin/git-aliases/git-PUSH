@@ -1,0 +1,9 @@
+#!/bin/bash
+
+BRANCH=`git symbolic-ref --short HEAD`
+if [ -n "$1" ]
+then
+    git push --set-upstream $1 $BRANCH
+else
+    git push --set-upstream origin $BRANCH
+fi

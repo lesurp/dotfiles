@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Individually commit all files, as a fixup of the last commit that changed each file. Rebase afterwards...
+git status --porcelain | sed s/^...// | xargs -I{} sh -c 'git add {}; git commit --fixup=$(git log -n 1 --pretty=format:%H -- {})'
