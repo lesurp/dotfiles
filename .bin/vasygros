@@ -1,0 +1,98 @@
+#!/bin/bash
+
+# curl -o https://raw.githubusercontent.com/pLesur/dotfiles/master/.bin/vasygros | bash
+
+read -d '' PACKAGE_LIST << EOF
+wget curl sudo zsh git kitty i3
+EOF
+
+NVIM_LOCATION=$HOME/.bin/nvim
+NVIM_CONFIG_DIR=$HOME/.config/nvim
+DOTFILES_REPO=https://github.com/plesur/dotfiles
+DOTFILES_LOCATION=.dotfiles
+
+###############
+### found from pacapt
+# Detect package type from /etc/issue
+found_arch() {
+    grep -qis "$2" /etc/issue && package_man="$1"
+}
+
+# Detect package type
+find_package_manager() {
+    found_arch PACMAN "Arch Linux" && return
+    found_arch DPKG   "Debian GNU/Linux" && return
+    found_arch DPKG   "Ubuntu" && return
+    #found_arch YUM    "CentOS" && return
+    #found_arch YUM    "Red Hat" && return
+    #found_arch YUM    "Fedora" && return
+    #found_arch ZYPPER "SUSE" && return
+    echo "Couldn't detect OS type (or it's not supported). Exiting..."
+    exit 1
+}
+
+get_update_cmd() {
+    case $1 in
+        PACMAN) update_cmd="pacman -Syu --noconfirm"; return;;
+        DPKG)   update_cmd="apt-get update; apt-get upgrade -y"; return;;
+        YUM)    update_cmd="yum"; return;;
+        ZYPPER) update_cmd="zypper"; return;;
+    esac
+}
+
+get_install_cmd() {
+    case $1 in
+        PACMAN) install_cmd="pacman -S --noconfirm"; return;;
+        DPKG)   install_cmd="apt-get install"; return;;
+        YUM)    install_cmd="yum"; return;;
+        ZYPPER) install_cmd="zypper"; return;;
+    esac
+}
+
+# also setup zsh as the user's default shell
+install_packages() {
+    find_package_manager
+    get_update_cmd $package_man
+    get_install_cmd $package_man
+    local zsh_location=$(which zsh)
+    local user=$(whoami)
+
+    # this is needed because xargs SUCKS
+    PACKAGE_LIST=$(sed 's/ /\n/g' <<< $PACKAGE_LIST)
+    # avoid stopping on non-existing packages (for different pacakge managers)
+    install_all_pkgs="echo \"$PACKAGE_LIST\" | xargs -I{} $install_cmd {}"
+    full_root_cmd="$update_cmd; $install_all_pkgs; chsh -s $zsh_location $user"
+    # avoid using the root pass if sudo is installed (as it might not be known)
+    # otherwise use su and install sudo in the process
+    if hash sudo 2>/dev/null
+    then
+        sudo sh -c "$full_root_cmd"
+    else
+        su -c "$full_root_cmd"
+    fi
+}
+
+install_nvim() {
+    wget https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage -O $NVIM_LOCATION
+    chmod +x $NVIM_LOCATION
+    curl -fLo $NVIM_CONFIG_DIR/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    $NVIM_LOCATION +PlugInstall +qa
+}
+
+install_dotfiles() {
+    git clone --bare $DOTFILES_REPO $DOTFILES_LOCATION
+    git --git-dir=$DOTFILES_LOCATION --work-tree=$HOME config status.showUntrackedFiles no
+    # if this is an interactive shell, prompt the user for a new branch name for this config
+    if [[ $- == *i* ]]
+    then
+        echo "The existing configurations are:"
+        git branch -r | tail -n +2 | cut -d"/" -f2
+        echo "Enter a desired config. If it doesn't exist, it will be created based on master."
+        readline -a branch_name
+        git checkout -B ${branch_name[0]}
+    fi
+}
+
+install_packages
+install_nvim
+install_dotfiles
