@@ -2,18 +2,17 @@
     "languageserver": {
         "clangd": {
             "command": "clangd",
-            "args": ["-background-index", "-background-index-rebuild-period=500", "-j=4"],
+            "args": ["-background-index", "-j=4"],
             "rootPatterns": ["compile_flags.txt", "compile_commands.json", ".vim/", ".git/", ".hg/"],
             "filetypes": ["c", "cpp", "h", "hpp", "objc", "objcpp"]
         },
-        "rust": {
-            "command": "ra_lsp_server",
-            "filetypes": ["rust"],
-            "rootPatterns": ["Cargo.toml"]
-        }
     },
-    "diagnostic.errorSign" : "💀",
-    "diagnostic.warningSign" : "🐑",
-    "diagnostic.infoSign" : "~>",
-    "diagnostic.hintSign" : "❓"
+    "python.linting.pylintArgs": ["--extension-pkg-whitelist=cv2"],
+    "rust-analyzer.enableCargoWatchOnStartup": "enabled",
+    "rust-analyzer.cargo-watch.command": "clippy",
+    "rust-analyzer.cargo-watch.arguments": "--all",
+    "diagnostic.errorSign" : "❌",
+    "diagnostic.warningSign" : "🐼",
+    "diagnostic.infoSign" : "🐥",
+    "diagnostic.hintSign" : "❗"
 }
