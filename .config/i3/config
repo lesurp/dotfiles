@@ -81,7 +81,7 @@ bindsym $mod+w layout tabbed
 bindsym $mod+e layout toggle split
 
 # toggle tiling / floating
-bindsym $mod+Shift+space floating toggle
+bindsym $mod+Shift+space exec "i3-msg floating toggle && i3-msg border toggle"
 
 # change focus between tiling / floating windows
 bindsym $mod+space focus mode_toggle
