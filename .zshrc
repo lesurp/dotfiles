@@ -24,6 +24,8 @@ bindkey '^[' autosuggest-execute
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=2'
 # add custom completion scripts
 source $ZSH/oh-my-zsh.sh
+fpath=($HOME/.zsh/completions $fpath)
+autoload -U compinit && compinit
 
 ### QoL / theming
 alias v=nvim
