@@ -40,6 +40,8 @@ set foldmethod=syntax
 " sanity-preserving shortcuts
 inoremap jj <Esc>
 command Q qa
+" fuck ex mode
+nnoremap Q <Nop>
 nnoremap ]c ]czz
 nnoremap ; :
 set pastetoggle=<F9>
@@ -164,7 +166,6 @@ call plug#begin()
 " random
 Plug 'vim-scripts/DoxygenToolkit.vim'
 Plug 'altercation/vim-colors-solarized'
-Plug 'ConradIrwin/vim-bracketed-paste'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 
@@ -179,7 +180,7 @@ Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 
 " lsp
-Plug 'neoclide/coc.nvim', {'do': './install.sh'}
+Plug 'neoclide/coc.nvim', {'do': './install.sh nightly'}
 
 call plug#end()
 
@@ -216,19 +217,16 @@ let g:spell_checker_rotation = ['en_us', 'fr']
 let g:UltiSnipsExpandTrigger="<Nop>"
 let g:UltiSnipsJumpForwardTrigger="<Nop>"
 let g:UltiSnipsJumpBackwardTrigger="<Nop>"
-
-let g:clang_format#detect_style_file = 1
-let g:clang_format#code_style = "llvm"
-let g:clang_format#style_options = {
-            \ "IndentWidth": 4,
-            \ "BreakBeforeBraces": "Allman",
-            \ "AllowShortIfStatementsOnASingleLine": "false",
-            \ "IndentCaseLabels": "false",
-            \ "ColumnLimit": 100}
-nnoremap <leader>ff :call CocAction('format')<CR>
+let g:snips_author = "Paul Lesur"
+let g:snips_github = "lesurp"
 
 nnoremap <silent> <leader>c :cnext<CR>
 nnoremap <silent> <leader>v :cprev<CR>
+
+function! CocHandled()
+    let coc_filetypes = ['c', 'cpp', 'cc', 'cxx', 'h', 'hpp', 'rust', 'javascript', 'python']
+    return index(coc_filetypes, &filetype) == - 1
+endfunction
 
 nnoremap <silent> gd :call CocAction('jumpDefinition')<CR>
 nnoremap <silent> gy :call CocAction('jumpTypeDefinition')<CR>
@@ -237,6 +235,8 @@ nnoremap <silent> gr :call CocAction('jumpReferences')<CR>
 nnoremap <silent> gs :call CocAction('documentSymbols')<CR>
 nnoremap <silent> gh :call CocAction('doHover')<CR>
 nnoremap <silent> <F2> :call CocAction('rename')<CR>
-let g:coc_snippet_next = '<C-n>'
+let g:coc_snippet_next = '<C-s>'
 inoremap <silent><expr> <c-s> pumvisible() ? coc#_select_confirm() : 
-                                           \"\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+            \"\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+
+nnoremap <expr> <leader>ff CocHandled() ? "gg=G''" : ":call CocAction('format')<CR>" 
