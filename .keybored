@@ -1,5 +1,1 @@
-keycode  18 = 9 bracketleft 9 bracketleft leftdoublequotemark leftsinglequotemark leftdoublequotemark
-keycode  19 = 0 bracketright 0 bracketright rightdoublequotemark rightsinglequotemark rightdoublequotemark
-keycode  34 = parenleft braceleft parenleft braceleft guillemotleft U2039 guillemotleft
-keycode  35 = parenright braceright parenright braceright guillemotright U203A guillemotright
 keycode  20 = underscore minus underscore minus copyright numerosign copyright
