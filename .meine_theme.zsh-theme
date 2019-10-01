@@ -15,6 +15,13 @@ prompt_setup_MEINE_THEME(){
 }
 
 prompt_MEINE_THEME_precmd(){
+  if [ -z "$VIRTUAL_ENV" ]
+  then
+    virtualenv_info=""
+  else
+    virtualenv_info="%{$fg[green]%}(`basename $VIRTUAL_ENV`) %{$reset_color%}"
+  fi
+
   local gitinfo=$(git_prompt_info)
   local gitinfo_nocolor=$(echo "$gitinfo" | perl -pe "s/%\{[^}]+\}//g")
   local exp_nocolor="$(print -P \"$base_prompt_nocolor$gitinfo_nocolor$post_prompt_nocolor\")"
@@ -25,7 +32,7 @@ prompt_MEINE_THEME_precmd(){
   if [[ $prompt_length -gt 40 ]]; then
     nl=$'\n%{\r%}';
   fi
-  PROMPT="$base_prompt$gitinfo$nl$post_prompt"
+  PROMPT="$virtualenv_info$base_prompt$gitinfo$nl$post_prompt"
 }
 
 prompt_setup_MEINE_THEME
