@@ -7,7 +7,7 @@
             "filetypes": ["c", "cpp", "h", "hpp", "objc", "objcpp"]
         },
     },
-    "python.linting.pylintArgs": ["--extension-pkg-whitelist=cv2"],
+    "python.linting.pylintArgs": ["--extension-pkg-whitelist=cv2", "--variable-rgx=^[a-z][a-z0-9]*((_[a-z0-9]+)*)?$", "--argument-rgx=^[a-z][a-z0-9]*((_[a-z0-9]+)*)?$"],
     "rust-analyzer.enableCargoWatchOnStartup": "enabled",
     "rust-analyzer.cargo-watch.command": "clippy",
     "rust-analyzer.cargo-watch.arguments": "--all",
