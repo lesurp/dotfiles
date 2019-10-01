@@ -141,7 +141,8 @@ function! EasyTerminal()
     endif
     tablast
 endfunction
-noremap <M--> :call EasyTerminal()<CR>
+noremap <M-_> :call EasyTerminal()<CR>
+
 
 " line breaks after the next comma
 " (useful for breaking up long fn declarations)
