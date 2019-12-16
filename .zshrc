@@ -33,8 +33,13 @@ alias g=git
 alias icat="kitty +kitten icat" # display image in terminal
 alias d="nvim -d" # diff files
 alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME' # handle dotfiles
-export EDITOR='nvim'
-export FZF_DEFAULT_COMMAND='rg --files --glob "!3rdparty/*"'
+if [ "$TERM" = "xterm-kitty" ]
+then;
+    alias ssh="kitty +kitten ssh"
+fi
+export EDITOR='nvr -s --remote-wait-silent'
+export GIT_EDITOR='nvr -s --remote-wait-silent'
+export FZF_DEFAULT_COMMAND='rg --files --glob "!third_party/*"'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_DEFAULT_OPTS="--color=light"
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
