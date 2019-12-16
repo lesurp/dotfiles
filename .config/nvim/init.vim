@@ -34,6 +34,9 @@ set signcolumn=yes
 set foldlevel=99
 set foldmethod=syntax
 
+" change cwd to current netrw dir
+let g:netrw_keepdir = 0
+
 """""""""""""""""""""
 """ QOL SHORTCUTS """
 """""""""""""""""""""
@@ -69,6 +72,9 @@ tnoremap <expr> <Esc> (&filetype == "fzf") ? "<Esc>" : "<c-\><c-n>"
 autocmd BufWinEnter,WinEnter term://* startinsert
 " ... and leave it when leaving the panel
 autocmd BufLeave term://* stopinsert
+
+" close nvr when closing git commands editor from terminal
+autocmd FileType gitcommit,gitrebase,gitconfig set bufhidden=delete
 
 tnoremap <C-w>w <C-\><C-n><C-w>w
 tnoremap <C-w>h <C-\><C-n><C-w>h
@@ -159,7 +165,6 @@ function! LocationListToggle()
         let g:location_list_open = 0
     endif
 endfunction
-nnoremap <leader>ll :call LocationListToggle()<CR>
 
 """"""""" PLUGINS
 call plug#begin()
@@ -174,7 +179,7 @@ Plug 'pLesur/vim_spell_checker_rotation'
 
 " cpp
 Plug 'rhysd/vim-clang-format', {'for': 'cpp'}
-"Plug 'cpiger/NeoDebug', {'for': 'cpp'}
+Plug 'sakhnik/nvim-gdb', { 'do': ':!./install.sh \| UpdateRemotePlugins' }
 
 " snippets
 Plug 'SirVer/ultisnips'
