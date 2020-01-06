@@ -7,12 +7,17 @@
             "filetypes": ["c", "cpp", "h", "hpp", "objc", "objcpp"]
         },
     },
-    "python.linting.pylintArgs": ["--extension-pkg-whitelist=cv2", "--variable-rgx=^[a-z][a-z0-9]*((_[a-z0-9]+)*)?$", "--argument-rgx=^[a-z][a-z0-9]*((_[a-z0-9]+)*)?$"],
-    "rust-analyzer.enableCargoWatchOnStartup": "enabled",
+    "python.linting.pylintArgs": [
+        "--generated-members=cv2.*",
+        "--extension-pkg-whitelist=cv2",
+        "--disable=missing-class-docstring",
+        "--disable=missing-function-docstring",
+        "--disable=invalid-name"
+    ],
     "rust-analyzer.cargo-watch.command": "clippy",
-    "rust-analyzer.cargo-watch.arguments": "--all",
-    "diagnostic.errorSign" : "❌",
-    "diagnostic.warningSign" : "🐼",
-    "diagnostic.infoSign" : "🐥",
-    "diagnostic.hintSign" : "❗"
+    "rust-analyzer.cargo-watch.arguments": ["--all"],
+    "diagnostic.errorSign" : "🍎",
+    "diagnostic.warningSign" : "🔶",
+    "diagnostic.infoSign" : "🥬",
+    "diagnostic.hintSign" : "💙"
 }
