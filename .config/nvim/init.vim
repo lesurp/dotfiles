@@ -166,6 +166,9 @@ function! LocationListToggle()
     endif
 endfunction
 
+" replace the default "man" by cppman (for cpp source files only)
+autocmd FileType cpp set keywordprg=:term\ cppman
+
 """"""""" PLUGINS
 call plug#begin()
 
@@ -174,8 +177,7 @@ Plug 'vim-scripts/DoxygenToolkit.vim'
 Plug 'altercation/vim-colors-solarized'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
-
-Plug 'pLesur/vim_spell_checker_rotation'
+Plug 'lesurp/vim_spell_checker_rotation'
 
 " cpp
 Plug 'rhysd/vim-clang-format', {'for': 'cpp'}
@@ -234,15 +236,30 @@ function! CocHandled()
     return index(coc_filetypes, &filetype) == - 1
 endfunction
 
+
+" Use `[g` and `]g` to navigate diagnostics
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
+
 nnoremap <silent> gd :call CocAction('jumpDefinition')<CR>
-nnoremap <silent> gy :call CocAction('jumpTypeDefinition')<CR>
-nnoremap <silent> gi :call CocAction('jumpImplementation')<CR>
+nnoremap <silent> gc :CocList<CR>
+nnoremap <silent> ge :CocList diagnostics<CR>
+nnoremap <silent> gs :CocList outline<CR>
 nnoremap <silent> gr :call CocAction('jumpReferences')<CR>
-nnoremap <silent> gs :call CocAction('documentSymbols')<CR>
-nnoremap <silent> gh :call CocAction('doHover')<CR>
+nmap <silent> gh :call CocAction('doHover')<CR>
+nmap <silent> gx <Plug>(coc-fix-current)
+" how do I get this?
+"nnoremap <silent> gv :call CocAction('preview')<CR>
 nnoremap <silent> <F2> :call CocAction('rename')<CR>
+
+" hihglight other instance of the varialbe we chill on
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
 let g:coc_snippet_next = '<C-s>'
 inoremap <silent><expr> <c-s> pumvisible() ? coc#_select_confirm() : 
             \"\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
+" if file sypported by CoC, run the global / selected formatting, otherwise
+" run gg=G
 nnoremap <expr> <leader>ff CocHandled() ? "gg=G''" : ":call CocAction('format')<CR>" 
+
