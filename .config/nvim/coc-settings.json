@@ -1,4 +1,5 @@
 {
+    "coc.preferences.jumpCommand": "tab drop",
     "languageserver": {
         "clangd": {
             "command": "clangd",
@@ -17,7 +18,7 @@
     "rust-analyzer.cargo-watch.command": "clippy",
     "rust-analyzer.cargo-watch.arguments": ["--all"],
     "diagnostic.errorSign" : "🍎",
-    "diagnostic.warningSign" : "🔶",
-    "diagnostic.infoSign" : "🥬",
+    "diagnostic.warningSign" : "🍌",
+    "diagnostic.infoSign" : "🥒",
     "diagnostic.hintSign" : "💙"
 }
