@@ -1,9 +1,13 @@
 #!/bin/bash
 
-# curl -o https://raw.githubusercontent.com/pLesur/dotfiles/master/.bin/vasygros | bash
+# curl -o https://raw.githubusercontent.com/lesurp/dotfiles/master/.bin/vasygros | bash
 
-read -d '' PACKAGE_LIST << EOF
+read -d '' GENERAL_PACKAGES << EOF
 wget curl sudo zsh git kitty i3
+EOF
+
+read -d '' CPP_PACKAGES << EOF
+clang clang++ cppman cmake
 EOF
 
 NVIM_LOCATION=$HOME/.bin/nvim
@@ -14,6 +18,7 @@ DOTFILES_LOCATION=.dotfiles
 ###############
 ### found from pacapt
 # Detect package type from /etc/issue
+# and set the package_man variable to the corresponding keyword
 found_arch() {
     grep -qis "$2" /etc/issue && package_man="$1"
 }
@@ -58,10 +63,10 @@ install_packages() {
     local user=$(whoami)
 
     # this is needed because xargs SUCKS
-    PACKAGE_LIST=$(sed 's/ /\n/g' <<< $PACKAGE_LIST)
-    # avoid stopping on non-existing packages (for different pacakge managers)
-    install_all_pkgs="echo \"$PACKAGE_LIST\" | xargs -I{} $install_cmd {}"
-    full_root_cmd="$update_cmd; $install_all_pkgs; chsh -s $zsh_location $user"
+    local PACKAGES=$(sed 's/ /\n/g' <<< $1)
+    # avoid stopping on non-existing packages (for different package managers)
+    install_all_pkgs="echo \"$PACKAGES\" | xargs -I{} $install_cmd {}"
+    local full_root_cmd="$update_cmd; $install_all_pkgs; chsh -s $zsh_location $user"
     # avoid using the root pass if sudo is installed (as it might not be known)
     # otherwise use su and install sudo in the process
     if hash sudo 2>/dev/null
@@ -93,6 +98,7 @@ install_dotfiles() {
     fi
 }
 
-install_packages
+install_packages $GENERAL_PACKAGES
+install_packages $CPP_PACKAGES
 install_nvim
 install_dotfiles
