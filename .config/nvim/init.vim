@@ -41,11 +41,12 @@ let g:netrw_keepdir = 0
 """ QOL SHORTCUTS """
 """""""""""""""""""""
 " sanity-preserving shortcuts
-inoremap jj <Esc>
 command Q qa
 " fuck ex mode
 nnoremap Q <Nop>
 nnoremap ]c ]czz
+nnoremap n nzz
+nnoremap N Nzz
 nnoremap ; :
 set pastetoggle=<F9>
 
@@ -59,6 +60,8 @@ inoremap <expr> <s-tab> ((pumvisible())?("\<C-p>"):("<s-tab>"))
 vnoremap <C-c> "+y
 vnoremap <C-x> "+d
 inoremap <C-S-v> "+p
+xnoremap <C-p> p
+xnoremap p "_dP
 
 " spellczeck
 autocmd BufNewFile,BufRead *.tex set spell textwidth=80
@@ -104,40 +107,6 @@ noremap <M-9> 9gt
 noremap <M-0> :tabnew<CR>
 
 """"""" BABY PLUGINS
-
-" Search within a scope (a {...} program block).
-" see http://vim.wikia.com/wiki/Search_in_current_function
-nnoremap <Leader>[ /<C-R>=<SID>ScopeSearch('[[', 1)<CR><CR>
-vnoremap <Leader>[ <Esc>/<C-R>=<SID>ScopeSearch('[[', 2)<CR><CR>gV
-nnoremap <Leader>{ /<C-R>=<SID>ScopeSearch('[{', 1)<CR><CR>
-vnoremap <Leader>{ <Esc>/<C-R>=<SID>ScopeSearch('[{', 2)<CR><CR>gV
-nnoremap <Leader>/ /<C-R>=<SID>ScopeSearch('[[', 0)<CR>
-vnoremap <Leader>/ <Esc>/<C-R>=<SID>ScopeSearch('[[', 2)<CR><CR>
-function! s:ScopeSearch(navigator, mode)
-    if a:mode == 0
-        let pattern = ''
-    elseif a:mode == 1
-        let pattern = '\<' . expand('<cword>') . '\>'
-    else
-        let old_reg = getreg('@')
-        let old_regtype = getregtype('@')
-        normal! gvy
-        let pattern = escape(@@, '/\.*$^~[')
-        call setreg('@', old_reg, old_regtype)
-    endif
-    let saveview = winsaveview()
-    execute 'normal! ' . a:navigator
-    let first = line('.')
-    normal %
-    let last = line('.')
-    normal %
-    call winrestview(saveview)
-    if first < last
-        return printf('\%%>%dl\%%<%dl%s', first-1, last+1, pattern)
-    endif
-    return "\b"
-endfunction
-
 function! EasyTerminal()
     if !exists('g:easy_terminal_canari')
         let g:easy_terminal_canari = 1
@@ -178,6 +147,7 @@ Plug 'altercation/vim-colors-solarized'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'lesurp/vim_spell_checker_rotation'
+Plug 'lesurp/git-blame.vim'
 
 " cpp
 Plug 'rhysd/vim-clang-format', {'for': 'cpp'}
@@ -192,9 +162,7 @@ Plug 'neoclide/coc.nvim', {'do': './install.sh nightly'}
 
 call plug#end()
 
-""""""""" END PLUGINS
-
-""" AESTHETICS
+""""""""""""""""""""""""" THEMING
 colorscheme solarized
 " NOTE: this stuff is for a light theme!
 hi StatusLine term=reverse ctermfg=248 ctermbg=7
@@ -204,8 +172,7 @@ au InsertEnter * hi SignColumn term=reverse ctermfg=69 ctermbg=2
 au InsertLeave * hi StatusLine term=reverse ctermfg=248 ctermbg=7
 au InsertLeave * hi SignColumn term=reverse ctermfg=69 ctermbg=7
 
-
-"""""""" PLUGIN CONF
+""""""""""""""""""""""""" FZF CONFIG
 nnoremap <leader>t :FZF<CR>
 let g:fzf_buffers_jump = 1
 let g:fzf_command_prefix = 'Fzf'
@@ -218,19 +185,44 @@ function! s:fzf_statusline()
 endfunction
 autocmd! User FzfStatusLine call <SID>fzf_statusline()
 
-nnoremap <leader>sp :<C-U>call SpellCheckRotate(v:count)<cr>
-let g:spell_checker_rotation = ['en_us', 'fr']
-
+""""""""""""""""""""""""" ULTISNIP CONFIG
 " we use the shortcut from coc, so we simply disable
 let g:UltiSnipsExpandTrigger="<Nop>"
 let g:UltiSnipsJumpForwardTrigger="<Nop>"
 let g:UltiSnipsJumpBackwardTrigger="<Nop>"
 let g:snips_author = "Paul Lesur"
 let g:snips_github = "lesurp"
-
 nnoremap <silent> <leader>c :cnext<CR>
 nnoremap <silent> <leader>v :cprev<CR>
 
+""""""""""""""""""""""""" GIT BLAME CONFIG
+function! s:blame_if_no_term()
+    if &buftype ==# 'terminal'
+        return
+    endif
+
+    let l:fname = expand('%:p')
+    if strwidth(l:fname) == 0
+        return
+    endif
+
+    if l:fname =~ "/.git/"
+        return
+    endif
+
+    if l:fname[strlen(l:fname) - 1] == '/'
+        return
+    endif
+
+    call gitblame#echo()
+endfunction
+autocmd CursorHold * call s:blame_if_no_term()
+
+""""""""""""""""""""""""" SPELLCHECKROTATE CONFIG
+nnoremap <leader>sp :<C-U>call SpellCheckRotate(v:count)<cr>
+let g:spell_checker_rotation = ['en_gb', 'fr', 'de']
+
+""""""""""""""""""""""""" COC CONFIG
 function! CocHandled()
     let coc_filetypes = ['c', 'cpp', 'cc', 'cxx', 'h', 'hpp', 'rust', 'javascript', 'python']
     return index(coc_filetypes, &filetype) == - 1
@@ -241,9 +233,10 @@ endfunction
 nmap <silent> [g <Plug>(coc-diagnostic-prev)
 nmap <silent> ]g <Plug>(coc-diagnostic-next)
 
-nnoremap <silent> gd :call CocAction('jumpDefinition')<CR>
 nnoremap <silent> gc :CocList<CR>
+nnoremap <silent> gd :call CocAction('jumpDefinition')<CR>
 nnoremap <silent> ge :CocList diagnostics<CR>
+nnoremap <silent> gf :CocFix<CR>
 nnoremap <silent> gs :CocList outline<CR>
 nnoremap <silent> gr :call CocAction('jumpReferences')<CR>
 nmap <silent> gh :call CocAction('doHover')<CR>
@@ -262,4 +255,3 @@ inoremap <silent><expr> <c-s> pumvisible() ? coc#_select_confirm() :
 " if file sypported by CoC, run the global / selected formatting, otherwise
 " run gg=G
 nnoremap <expr> <leader>ff CocHandled() ? "gg=G''" : ":call CocAction('format')<CR>" 
-
