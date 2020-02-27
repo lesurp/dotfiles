@@ -149,8 +149,6 @@ Plug 'junegunn/fzf.vim'
 Plug 'lesurp/vim_spell_checker_rotation'
 Plug 'lesurp/git-blame.vim'
 
-" cpp
-Plug 'rhysd/vim-clang-format', {'for': 'cpp'}
 Plug 'sakhnik/nvim-gdb', { 'do': ':!./install.sh \| UpdateRemotePlugins' }
 
 " snippets
