@@ -13,7 +13,7 @@ set $mod Mod4
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
-font pango:monospace 8
+font pango: Fira Code 8
 
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
@@ -167,6 +167,15 @@ bindsym $mod+r mode "resize"
 # finds out, if available)
 bar {
         status_command i3status
+        colors {
+            separator #f000000
+                background #222222
+                #statusline #b1b1b1
+                focused_workspace #207720 #105510 #c0c0c0
+                #active_workspace #ffffff #333333 #888888
+                #inactive_workspace #cecece #333333 #f1f1f1
+                #urgent_workspace #eb709b #eb709b #ffffff
+        }
 }
 
 ######## AUTO START ########
