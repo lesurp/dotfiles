@@ -36,7 +36,7 @@ bindsym $mod+Return exec kitty
 bindsym $mod+Shift+q kill
 
 # start dmenu (a program launcher)
-bindsym $mod+d exec dmenu_run
+bindsym $mod+d exec dmenu_run -sb '#105510' -nb '#505050'
 # There also is the (new) i3-dmenu-desktop which only displays applications
 # shipping a .desktop file. It is a wrapper around dmenu, so you need that
 # installed.
@@ -170,14 +170,15 @@ bar {
         separator_symbol "፨"
         colors {
                 separator #f000f0
-                background #222222
+                background #505050
                 #statusline #b1b1b1
                 focused_workspace #207720 #105510 #c0c0c0
-                #active_workspace #ffffff #333333 #888888
-                #inactive_workspace #cecece #333333 #f1f1f1
+                inactive_workspace #333333 #333333 #888888
+                active_workspace #a0a0a0 #a0a0a0 #333333
                 #urgent_workspace #eb709b #eb709b #ffffff
         }
 }
+client.focused #00000 #105510 #e0e0e0 #f0f0f0 #000000
 
 ######## AUTO START ########
 # network manager
