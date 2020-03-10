@@ -1,3 +1,35 @@
+autoload -U compinit && compinit
+
+export ZSH="${HOME}/.zsh"
+ZSH_CACHE_DIR="$ZSH/cache"
+ZSH_CUSTOM="$ZSH/custom"
+SHORT_HOST=${HOST/.*/}
+ZSH_COMPDUMP="${ZDOTDIR:-${HOME}}/.zcompdump-${SHORT_HOST}-${ZSH_VERSION}"
+
+# add a function path
+fpath=($ZSH/functions $ZSH/completions $fpath)
+
+# Load all of the config files in ~/oh-my-zsh that end in .zsh
+# TIP: Add files you don't want in git to .gitignore
+for config_file ($ZSH/lib/*.zsh); do
+  custom_config_file="${ZSH_CUSTOM}/lib/${config_file:t}"
+  [ -f "${custom_config_file}" ] && config_file=${custom_config_file}
+  source $config_file
+done
+
+if [[ $ZSH_DISABLE_COMPFIX != true ]]; then
+  # If completion insecurities exist, warn the user
+  handle_completion_insecurities
+  # Load only from secure directories
+  compinit -i -C -d "${ZSH_COMPDUMP}"
+else
+  # If the user wants it, load from all found directories
+  compinit -u -C -d "${ZSH_COMPDUMP}"
+fi
+
+# Load the theme
+source $ZSH/zsh_theme
+
 ##### zsh conf
 # colorized man
 function man() {
@@ -14,17 +46,6 @@ function man() {
 		PATH="$HOME/bin:$PATH" \
 			man "$@"
 }
-
-# Path to your oh-my-zsh installation.
-export ZSH=$HOME/.oh-my-zsh
-ZSH_THEME="meine_theme"
-# binds the auto complete to alt+enter
-bindkey '^[' autosuggest-execute
-export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=2'
-# add custom completion scripts
-source $ZSH/oh-my-zsh.sh
-fpath=($HOME/.zsh/completions $fpath)
-autoload -U compinit && compinit
 
 ### QoL / theming
 alias v=nvim
