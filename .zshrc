@@ -18,7 +18,6 @@ function man() {
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
 ZSH_THEME="meine_theme"
-plugins=(zsh-autosuggestions)
 # binds the auto complete to alt+enter
 bindkey '^[' autosuggest-execute
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=2'
@@ -45,7 +44,3 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_DEFAULT_OPTS="--color=light"
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 export rcp="rsync -avhW --no-compress --progress"
-
-# funny stuff
-export CXX=clang++
-export CC=clang
