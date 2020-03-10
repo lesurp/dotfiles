@@ -47,7 +47,7 @@ find_package_manager() {
     exit 1
 }
 
-get_update_cmd() {
+find_update_cmd() {
     case $1 in
         PACMAN) update_cmd="pacman -Syu --noconfirm"; return;;
         DPKG)   update_cmd="apt-get update; apt-get upgrade -y"; return;;
@@ -56,7 +56,7 @@ get_update_cmd() {
     esac
 }
 
-get_install_cmd() {
+find_install_cmd() {
     case $1 in
         PACMAN) install_cmd="pacman -S --noconfirm"; return;;
         DPKG)   install_cmd="apt-get install"; return;;
@@ -68,7 +68,7 @@ get_install_cmd() {
 # we do this once at the beginning, because when we install sudo during the script,
 # a second detection will then try to use it despite the suoders file not being
 # configured. And even if it were it'd require another password prompt...
-get_root_cmd() {
+find_root_cmd() {
     # avoid using the root pass if sudo is installed (as it might not be known)
     # otherwise use su and install sudo in the process
     if hash sudo 2>/dev/null
@@ -79,18 +79,21 @@ get_root_cmd() {
     fi
 }
 
+initialize_package_manager() {
+    # used to update the package list, and upgrade the packages themselves
+    find_update_cmd $package_man
+    # used to install any new package
+    find_install_cmd $package_man
+    ${root_cmd} "$update_cmd"
+}
+
 # also setup zsh as the user's default shell
 install_packages() {
     # this is needed because xargs SUCKS
     local packages=$(sed 's/ /\n/g' <<< $@)
     # avoid stopping on non-existing packages (for different package managers)
     install_all_pkgs="echo \"$packages\" | xargs -I{} $install_cmd {}"
-
-
-    local user=$(whoami)
-    ${root_cmd} "$update_cmd
-    $install_all_pkgs
-    chsh -s $(which zsh) $user"
+    ${root_cmd} "$install_all_pkgs"
 }
 
 install_nvim() {
@@ -118,13 +121,18 @@ install_dotfiles() {
     fi
 }
 
+install_zsh() {
+    local user=$(whoami)
+    ${root_cmd} chsh -s $(which zsh) $user
+}
+
+find_root_cmd
 find_package_manager
-get_update_cmd $package_man
-get_install_cmd $package_man
-get_root_cmd
+initialize_package_manager
 install_packages "$GENERAL_PACKAGES"
 install_packages "$I3_PACKAGES"
 install_packages "$NVIM_PACKAGES"
 install_packages "$CPP_PACKAGES"
-install_nvim
 install_dotfiles
+install_nvim
+install_zsh
