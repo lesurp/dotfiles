@@ -1,9 +1,20 @@
 #!/bin/bash
 
-# curl -o https://raw.githubusercontent.com/lesurp/dotfiles/master/.bin/vasygros | bash
+# curl -s https://raw.githubusercontent.com/lesurp/dotfiles/master/.bin/vasygros | bash
 
 read -d '' GENERAL_PACKAGES << EOF
-wget curl sudo zsh git kitty i3
+wget curl sudo zsh git kitty which firefox readline xorg-xinit python-pip
+EOF
+
+read -d '' I3_PACKAGES << EOF
+i3 dmenu network-manager network-manager-applet dunst
+EOF
+
+# fuse2 is erquired to run nvim from the AppImage
+# node / npm are for the cocnvim runtime
+# xclip for clipboard support
+read -d '' NVIM_PACKAGES << EOF
+fuse2 nodejs npm xclip
 EOF
 
 read -d '' CPP_PACKAGES << EOF
@@ -54,27 +65,32 @@ get_install_cmd() {
     esac
 }
 
-# also setup zsh as the user's default shell
-install_packages() {
-    find_package_manager
-    get_update_cmd $package_man
-    get_install_cmd $package_man
-    local zsh_location=$(which zsh)
-    local user=$(whoami)
-
-    # this is needed because xargs SUCKS
-    local PACKAGES=$(sed 's/ /\n/g' <<< $1)
-    # avoid stopping on non-existing packages (for different package managers)
-    install_all_pkgs="echo \"$PACKAGES\" | xargs -I{} $install_cmd {}"
-    local full_root_cmd="$update_cmd; $install_all_pkgs; chsh -s $zsh_location $user"
+# we do this once at the beginning, because when we install sudo during the script,
+# a second detection will then try to use it despite the suoders file not being
+# configured. And even if it were it'd require another password prompt...
+get_root_cmd() {
     # avoid using the root pass if sudo is installed (as it might not be known)
     # otherwise use su and install sudo in the process
     if hash sudo 2>/dev/null
     then
-        sudo sh -c "$full_root_cmd"
+        root_cmd="sudo sh -c"
     else
-        su -c "$full_root_cmd"
+        root_cmd="su -c"
     fi
+}
+
+# also setup zsh as the user's default shell
+install_packages() {
+    # this is needed because xargs SUCKS
+    local packages=$(sed 's/ /\n/g' <<< $@)
+    # avoid stopping on non-existing packages (for different package managers)
+    install_all_pkgs="echo \"$packages\" | xargs -I{} $install_cmd {}"
+
+
+    local user=$(whoami)
+    ${root_cmd} "$update_cmd
+    $install_all_pkgs
+    chsh -s $(which zsh) $user"
 }
 
 install_nvim() {
@@ -82,23 +98,33 @@ install_nvim() {
     chmod +x $NVIM_LOCATION
     curl -fLo $NVIM_CONFIG_DIR/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
     $NVIM_LOCATION +PlugInstall +qa
+    pip3 install neovim-remote --user
 }
 
 install_dotfiles() {
     git clone --bare $DOTFILES_REPO $DOTFILES_LOCATION
-    git --git-dir=$DOTFILES_LOCATION --work-tree=$HOME config status.showUntrackedFiles no
+    alias config="git --git-dir=${DOTFILES_LOCATION} --work-tree=${HOME}"
+    config config status.showUntrackedFiles no
     # if this is an interactive shell, prompt the user for a new branch name for this config
-    if [[ $- == *i* ]]
+    if [ -t 1 ]
     then
         echo "The existing configurations are:"
-        git branch -r | tail -n +2 | cut -d"/" -f2
+        config branch -r | tail -n +2 | cut -d"/" -f2
         echo "Enter a desired config. If it doesn't exist, it will be created based on master."
         readline -a branch_name
-        git checkout -B ${branch_name[0]}
+        config checkout -B ${branch_name[0]}
+    else
+        config checkout master
     fi
 }
 
-install_packages $GENERAL_PACKAGES
-install_packages $CPP_PACKAGES
+find_package_manager
+get_update_cmd $package_man
+get_install_cmd $package_man
+get_root_cmd
+install_packages "$GENERAL_PACKAGES"
+install_packages "$I3_PACKAGES"
+install_packages "$NVIM_PACKAGES"
+install_packages "$CPP_PACKAGES"
 install_nvim
 install_dotfiles
