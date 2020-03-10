@@ -1,3 +1,7 @@
+# This disables running compinit from /etc/zsh
+# Reduces startup time by a lot!
+skip_global_compinit=1
+
 # My stuff
 PATH="$HOME/.bin:$PATH"
 PATH="$HOME/.bin/git-aliases:$PATH"
