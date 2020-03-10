@@ -106,18 +106,18 @@ install_nvim() {
 
 install_dotfiles() {
     git clone --bare $DOTFILES_REPO $DOTFILES_LOCATION
-    alias config="git --git-dir=${DOTFILES_LOCATION} --work-tree=${HOME}"
-    config config status.showUntrackedFiles no
+    config="git --git-dir=${DOTFILES_LOCATION} --work-tree=${HOME}"
+    $config config status.showUntrackedFiles no
     # if this is an interactive shell, prompt the user for a new branch name for this config
     if [ -t 1 ]
     then
         echo "The existing configurations are:"
-        config branch -r | tail -n +2 | cut -d"/" -f2
+        $config branch -r | tail -n +2 | cut -d"/" -f2
         echo "Enter a desired config. If it doesn't exist, it will be created based on master."
         readline -a branch_name
-        config checkout -B ${branch_name[0]}
+        $config checkout -B ${branch_name[0]}
     else
-        config checkout master
+        $config checkout master
     fi
 }
 
