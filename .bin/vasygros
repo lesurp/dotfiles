@@ -2,31 +2,44 @@
 
 # curl -s https://raw.githubusercontent.com/lesurp/dotfiles/master/.bin/vasygros | bash
 
-read -d '' GENERAL_PACKAGES << EOF
-wget curl sudo zsh git kitty which firefox readline xorg-xinit python-pip
-EOF
-
-read -d '' I3_PACKAGES << EOF
-i3 dmenu network-manager network-manager-applet dunst
-EOF
-
 # fuse2 is erquired to run nvim from the AppImage
 # node / npm are for the cocnvim runtime
 # xclip for clipboard support
-read -d '' NVIM_PACKAGES << EOF
-fuse2 nodejs npm xclip
-EOF
+# cppman is an offline cpp std lib documentation
+read -d '' PACMAN_PACKAGES << EOF
+wget curl sudo zsh git kitty which firefox readline xorg-xinit python-pip
 
-read -d '' CPP_PACKAGES << EOF
+i3 dmenu network-manager network-manager-applet dunst
+
+fuse2 nodejs npm xclip
+
 clang clang++ cppman cmake
 EOF
 
-NVIM_LOCATION=$HOME/.bin/nvim
-NVIM_CONFIG_DIR=$HOME/.config/nvim
-DOTFILES_REPO=https://github.com/lesurp/dotfiles
-DOTFILES_LOCATION=.dotfiles
+# Those are to be installed with cargo
+read -d '' CARGO_PACKAGES << EOF
+ripgrep
+EOF
 
-###############
+
+############################################## GLOBAL VARS
+# Stores variables set by each module of this script
+# This allows to handle updates
+DOTFILES_STATUS_FILE=$HOME/.dotfiles.status
+# Each module should append its configuration to this variable
+# We stores its value to the above file
+DOTFILES_STATUS_OUT=""
+if [ -f $FIRST_RUN_FILE ]; then
+    source $DOTFILES_STATUS_FILE
+fi
+TRUE=0
+FALSE=1
+
+dotfiles_append_out() {
+    DOTFILES_STATUS_OUT+="$1=${!1}\n"
+}
+
+############################################## SYSTEM PACKAGE INSTALL
 ### found from pacapt
 # Detect package type from /etc/issue
 # and set the package_man variable to the corresponding keyword
@@ -80,6 +93,8 @@ find_root_cmd() {
 }
 
 initialize_package_manager() {
+    find_root_cmd 
+    find_package_manager
     # used to update the package list, and upgrade the packages themselves
     find_update_cmd $package_man
     # used to install any new package
@@ -96,17 +111,51 @@ install_packages() {
     ${root_cmd} "$install_all_pkgs"
 }
 
+install_system_packages() {
+    initialize_package_manager
+
+    if [ "$DOTFILES_STATUS_SYSTEM_INSTALLED" -eq $TRUE ]; then
+    else
+        install_packages $@
+    fi
+
+    DOTFILES_STATUS_SYSTEM_INSTALLED=$TRUE
+    dotfiles_append_out DOTFILES_STATUS_SYSTEM_INSTALLED
+}
+############################################## SYSTEM PACKAGE INSTALL END
+
+############################################## INSTALL NEOVIM
+NVIM_LOCATION=$HOME/.bin/nvim
+NVIM_CONFIG_DIR=$HOME/.config/nvim
+
 install_nvim() {
     wget https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage -O $NVIM_LOCATION
     chmod +x $NVIM_LOCATION
-    curl -fLo $NVIM_CONFIG_DIR/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    $NVIM_LOCATION +PlugInstall +qa
-    pip3 install neovim-remote --user
+
+    if [ "$DOTFILES_STATUS_NVIM_INSTALLED" -eq $TRUE ]; then
+        $NVIM_LOCATION +PlugUpdate +qa
+    else
+        curl -fLo $NVIM_CONFIG_DIR/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+        $NVIM_LOCATION +PlugInstall +qa
+        pip3 install neovim-remote --user
+    fi
+
+    DOTFILES_STATUS_NVIM_INSTALLED=$TRUE
+    dotfiles_append_out DOTFILES_STATUS_NVIM_INSTALLED
 }
 
+############################################## INSTALL CONFIG
+CONFIG_REPO=https://github.com/lesurp/dotfiles
+CONFIG_LOCATION=.dotfiles
+
 install_dotfiles() {
-    git clone --bare $DOTFILES_REPO $DOTFILES_LOCATION
-    config="git --git-dir=${DOTFILES_LOCATION} --work-tree=${HOME}"
+    if [ "$DOTFILES_STATUS_CONFIG_INSTALLED" -eq $TRUE ]; then
+        dotfiles_append_out DOTFILES_STATUS_CONFIG_INSTALLED
+        return
+    fi
+
+    git clone --bare $CONFIG_REPO $CONFIG_LOCATION
+    config="git --git-dir=${CONFIG_LOCATION} --work-tree=${HOME}"
     $config config status.showUntrackedFiles no
     # if this is an interactive shell, prompt the user for a new branch name for this config
     if [ -t 1 ]
@@ -119,20 +168,40 @@ install_dotfiles() {
     else
         $config checkout master
     fi
+
+    DOTFILES_STATUS_CONFIG_INSTALLED=$TRUE
+    dotfiles_append_out DOTFILES_STATUS_CONFIG_INSTALLED
 }
+
+############################################## INSTALL ZSH
+ZSH_HOME=$HOME/.zsh
+ZSH_COMPLETIONS=$ZSH_HOME/completions
 
 install_zsh() {
     local user=$(whoami)
     ${root_cmd} chsh -s $(which zsh) $user
 }
 
-find_root_cmd
-find_package_manager
-initialize_package_manager
-install_packages "$GENERAL_PACKAGES"
-install_packages "$I3_PACKAGES"
-install_packages "$NVIM_PACKAGES"
-install_packages "$CPP_PACKAGES"
+############################################## INSTALL RUSTUP / CARGO
+install_rustup() {
+    if [ "$DOTFILES_STATUS_RUSTUP_INSTALLED" -eq $TRUE ]; then
+        rustup update
+    else
+        curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain nightly -y
+        DOTFILES_STATUS_RUSTUP_INSTALLED=$TRUE
+    fi
+    rustup component add rust-src
+    rustup completions zsh > $ZSH_COMPLETIONS/_rustup
+    cargo install "${CARGO_PACKAGES}"
+
+    dotfiles_append_out DOTFILES_STATUS_RUSTUP_INSTALLED
+}
+
+install_system_packages "$PACMAN_PACKAGES"
 install_dotfiles
 install_nvim
 install_zsh
+install_rustup
+
+# Save the conf
+printf "$DOTFILES_STATUS_OUT" > $DOTFILES_STATUS_FILE
