@@ -28,7 +28,7 @@ else
 fi
 
 # Load the theme
-source $ZSH/zsh_theme
+source $ZSH/theme
 
 ##### zsh conf
 # colorized man
