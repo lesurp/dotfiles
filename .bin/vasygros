@@ -26,18 +26,20 @@ EOF
 # Stores variables set by each module of this script
 # This allows to handle updates
 DOTFILES_STATUS_FILE=$HOME/.dotfiles.status
+if [ -f $DOTFILES_STATUS_FILE ]; then
+    source $DOTFILES_STATUS_FILE
+fi
+
 # Each module should append its configuration to this variable
 # We stores its value to the above file
 DOTFILES_STATUS_OUT=""
-if [ -f $FIRST_RUN_FILE ]; then
-    source $DOTFILES_STATUS_FILE
-fi
-TRUE=0
-FALSE=1
-
 dotfiles_append_out() {
     DOTFILES_STATUS_OUT+="$1=${!1}\n"
 }
+
+# Each config should use this when saving state
+# Don't forget that the variables may be empty!
+TRUE=0
 
 ############################################## SYSTEM PACKAGE INSTALL
 ### found from pacapt
@@ -192,6 +194,7 @@ install_rustup() {
     fi
     rustup component add rust-src
     rustup completions zsh > $ZSH_COMPLETIONS/_rustup
+    rustup completions zsh cargo > $ZSH_COMPLETIONS/_cargo
     cargo install "${CARGO_PACKAGES}"
 
     dotfiles_append_out DOTFILES_STATUS_RUSTUP_INSTALLED
