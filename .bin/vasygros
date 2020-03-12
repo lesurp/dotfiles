@@ -41,6 +41,17 @@ dotfiles_append_out() {
 # Don't forget that the variables may be empty!
 TRUE=0
 
+# avoid using the root pass if sudo is installed (as it might not be known)
+# otherwise use su and install sudo in the process
+# this is done only once to avoid e.g. installing sudo during the script and breaking everything else
+# this also requires only one password prompt
+if hash sudo 2>/dev/null
+then
+    root_cmd="sudo sh -c"
+else
+    root_cmd="su -c"
+fi
+
 ############################################## SYSTEM PACKAGE INSTALL
 ### found from pacapt
 # Detect package type from /etc/issue
@@ -80,22 +91,7 @@ find_install_cmd() {
     esac
 }
 
-# we do this once at the beginning, because when we install sudo during the script,
-# a second detection will then try to use it despite the suoders file not being
-# configured. And even if it were it'd require another password prompt...
-find_root_cmd() {
-    # avoid using the root pass if sudo is installed (as it might not be known)
-    # otherwise use su and install sudo in the process
-    if hash sudo 2>/dev/null
-    then
-        root_cmd="sudo sh -c"
-    else
-        root_cmd="su -c"
-    fi
-}
-
 initialize_package_manager() {
-    find_root_cmd 
     find_package_manager
     # used to update the package list, and upgrade the packages themselves
     find_update_cmd $package_man
@@ -180,6 +176,8 @@ ZSH_HOME=$HOME/.zsh
 ZSH_COMPLETIONS=$ZSH_HOME/completions
 
 install_zsh() {
+    mkdir -p $ZSH_COMPLETIONS
+
     local user=$(whoami)
     ${root_cmd} chsh -s $(which zsh) $user
 }
