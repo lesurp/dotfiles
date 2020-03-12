@@ -2,12 +2,19 @@
 
 # curl -s https://raw.githubusercontent.com/lesurp/dotfiles/master/.bin/vasygros | bash
 
+# sets the function ctr_c as a callback when SIGINT (^C) is received
+trap ctrl_c INT
+ctrl_c() {
+    printf "SIGINT received - aborting!\n"
+    exit 1
+}
+
 # fuse2 is erquired to run nvim from the AppImage
 # node / npm are for the cocnvim runtime
 # xclip for clipboard support
 # cppman is an offline cpp std lib documentation
-read -d '' PACMAN_PACKAGES << EOF
-wget curl sudo zsh git kitty which firefox readline xorg-xinit python-pip
+read -d '' DOTFILES_PACMAN_PACKAGES << EOF
+wget curl sudo zsh git kitty which firefox xorg-xinit python-pip
 
 i3 dmenu network-manager network-manager-applet dunst
 
@@ -17,29 +24,35 @@ clang clang++ cppman cmake
 EOF
 
 # Those are to be installed with cargo
-read -d '' CARGO_PACKAGES << EOF
+read -d '' DOTFILES_CARGO_PACKAGES << EOF
 ripgrep
 EOF
 
 
 ############################################## GLOBAL VARS
-# Stores variables set by each module of this script
-# This allows to handle updates
-DOTFILES_STATUS_FILE=$HOME/.dotfiles.status
-if [ -f $DOTFILES_STATUS_FILE ]; then
-    source $DOTFILES_STATUS_FILE
+DOTFILES_UPSTREAM_REPO=https://github.com/lesurp/dotfiles
+DOTFILES_HOME=$HOME/.dotfiles
+DOTFILES_REPO=$DOTFILES_HOME/repo
+DOTFILES_CONFIG_FILE=$DOTFILES_HOME/config
+if [ -f $DOTFILES_CONFIG_FILE ]; then
+    source $DOTFILES_CONFIG_FILE
 fi
+
 
 # Each module should append its configuration to this variable
 # We stores its value to the above file
-DOTFILES_STATUS_OUT=""
-dotfiles_append_out() {
-    DOTFILES_STATUS_OUT+="$1=${!1}\n"
+DOTFILES_CONFIG_OUT=""
+append_config() {
+    DOTFILES_CONFIG_OUT+="$1=${!1}\n"
 }
+
+append_config DOTFILES_HOME
+append_config DOTFILES_REPO
+append_config DOTFILES_UPSTREAM_REPO
 
 # Each config should use this when saving state
 # Don't forget that the variables may be empty!
-TRUE=0
+TRUE="true"
 
 # avoid using the root pass if sudo is installed (as it might not be known)
 # otherwise use su and install sudo in the process
@@ -51,6 +64,18 @@ then
 else
     root_cmd="su -c"
 fi
+
+root() {
+    ${root_cmd} "$@"
+}
+
+next() {
+    printf -- '=%.0s' {1..80}
+    printf "\nSTARTING: $1\n"
+    printf -- '-%.0s' {1..40} \n
+    printf "\n"
+    $@
+}
 
 ############################################## SYSTEM PACKAGE INSTALL
 ### found from pacapt
@@ -97,7 +122,7 @@ initialize_package_manager() {
     find_update_cmd $package_man
     # used to install any new package
     find_install_cmd $package_man
-    ${root_cmd} "$update_cmd"
+    root "$update_cmd"
 }
 
 # also setup zsh as the user's default shell
@@ -106,19 +131,18 @@ install_packages() {
     local packages=$(sed 's/ /\n/g' <<< $@)
     # avoid stopping on non-existing packages (for different package managers)
     install_all_pkgs="echo \"$packages\" | xargs -I{} $install_cmd {}"
-    ${root_cmd} "$install_all_pkgs"
+    root "$install_all_pkgs"
 }
 
 install_system_packages() {
     initialize_package_manager
 
-    if [ "$DOTFILES_STATUS_SYSTEM_INSTALLED" -eq $TRUE ]; then
-    else
+    if [ "$DOTFILES_CONFIG_SYSTEM_INSTALLED" != $TRUE ]; then
         install_packages $@
     fi
 
-    DOTFILES_STATUS_SYSTEM_INSTALLED=$TRUE
-    dotfiles_append_out DOTFILES_STATUS_SYSTEM_INSTALLED
+    DOTFILES_CONFIG_SYSTEM_INSTALLED=$TRUE
+    append_config DOTFILES_CONFIG_SYSTEM_INSTALLED
 }
 ############################################## SYSTEM PACKAGE INSTALL END
 
@@ -130,7 +154,7 @@ install_nvim() {
     wget https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage -O $NVIM_LOCATION
     chmod +x $NVIM_LOCATION
 
-    if [ "$DOTFILES_STATUS_NVIM_INSTALLED" -eq $TRUE ]; then
+    if [ "$DOTFILES_CONFIG_NVIM_INSTALLED" == $TRUE ]; then
         $NVIM_LOCATION +PlugUpdate +qa
     else
         curl -fLo $NVIM_CONFIG_DIR/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
@@ -138,71 +162,84 @@ install_nvim() {
         pip3 install neovim-remote --user
     fi
 
-    DOTFILES_STATUS_NVIM_INSTALLED=$TRUE
-    dotfiles_append_out DOTFILES_STATUS_NVIM_INSTALLED
+    DOTFILES_CONFIG_NVIM_INSTALLED=$TRUE
+    append_config DOTFILES_CONFIG_NVIM_INSTALLED
 }
 
 ############################################## INSTALL CONFIG
-CONFIG_REPO=https://github.com/lesurp/dotfiles
-CONFIG_LOCATION=.dotfiles
 
-install_dotfiles() {
-    if [ "$DOTFILES_STATUS_CONFIG_INSTALLED" -eq $TRUE ]; then
-        dotfiles_append_out DOTFILES_STATUS_CONFIG_INSTALLED
+install_repo() {
+    if [ "$DOTFILES_CONFIG_REPO_INSTALLED" == $TRUE ]; then
+        printf "Repository was already cloned, nothing else to do here.\n"
+        append_config DOTFILES_CONFIG_REPO_INSTALLED
         return
     fi
 
-    git clone --bare $CONFIG_REPO $CONFIG_LOCATION
-    config="git --git-dir=${CONFIG_LOCATION} --work-tree=${HOME}"
+    git clone --bare $DOTFILES_UPSTREAM_REPO $DOTFILES_REPO
+    config="git --git-dir=${DOTFILES_REPO} --work-tree=${HOME}"
     $config config status.showUntrackedFiles no
     # if this is an interactive shell, prompt the user for a new branch name for this config
-    if [ -t 1 ]
-    then
+    if [ -t 1 ]; then
         echo "The existing configurations are:"
-        $config branch -r | tail -n +2 | cut -d"/" -f2
-        echo "Enter a desired config. If it doesn't exist, it will be created based on master."
-        readline -a branch_name
-        $config checkout -B ${branch_name[0]}
+        $config branch -a | tail -n +2 | cut -d"/" -f2
+        printf "Enter a desired configuration branch.\n"
+        read -p "If it doesn't exist, it will be created based on master. " branch_name
+        if [ -z "${branch_name}" ]; then
+            branch_name=master
+        fi
     else
-        $config checkout master
+        branch_name=master
     fi
+    $config checkout -B ${branch_name}
 
-    DOTFILES_STATUS_CONFIG_INSTALLED=$TRUE
-    dotfiles_append_out DOTFILES_STATUS_CONFIG_INSTALLED
+    printf "Set dotfiles' configuration branch to ${branch_name}\n"
+
+    DOTFILES_CONFIG_REPO_INSTALLED=$TRUE
+    append_config DOTFILES_CONFIG_REPO_INSTALLED
 }
 
 ############################################## INSTALL ZSH
-ZSH_HOME=$HOME/.zsh
-ZSH_COMPLETIONS=$ZSH_HOME/completions
+DOTFILES_ZSH_HOME=$HOME/.zsh
+DOTFILES_ZSH_COMPLETIONS=$DOTFILES_ZSH_HOME/completions
 
 install_zsh() {
-    mkdir -p $ZSH_COMPLETIONS
+    mkdir -p $DOTFILES_ZSH_COMPLETIONS
 
     local user=$(whoami)
-    ${root_cmd} chsh -s $(which zsh) $user
+    root "chsh -s $(which zsh) $user"
+
+    printf "Set ${user}'s shell to zsh\n"
+
+    append_config DOTFILES_ZSH_HOME
+    append_config DOTFILES_ZSH_COMPLETIONS
 }
 
 ############################################## INSTALL RUSTUP / CARGO
 install_rustup() {
-    if [ "$DOTFILES_STATUS_RUSTUP_INSTALLED" -eq $TRUE ]; then
+    if [ "$DOTFILES_CONFIG_RUSTUP_INSTALLED" == $TRUE ]; then
+        printf "Updating rust install...\n"
         rustup update
     else
-        curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain nightly -y
-        DOTFILES_STATUS_RUSTUP_INSTALLED=$TRUE
+        printf "Installing rust toolchain...\n"
+        curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain nightly --no-modify-path
+        DOTFILES_CONFIG_RUSTUP_INSTALLED=$TRUE
     fi
     rustup component add rust-src
-    rustup completions zsh > $ZSH_COMPLETIONS/_rustup
-    rustup completions zsh cargo > $ZSH_COMPLETIONS/_cargo
-    cargo install "${CARGO_PACKAGES}"
+    rustup completions zsh > $DOTFILES_ZSH_COMPLETIONS/_rustup
+    rustup completions zsh cargo > $DOTFILES_ZSH_COMPLETIONS/_cargo
+    cargo install "${DOTFILES_CARGO_PACKAGES}"
 
-    dotfiles_append_out DOTFILES_STATUS_RUSTUP_INSTALLED
+    printf "Update/installation finished\n"
+
+    append_config DOTFILES_CONFIG_RUSTUP_INSTALLED
 }
 
-install_system_packages "$PACMAN_PACKAGES"
-install_dotfiles
-install_nvim
-install_zsh
-install_rustup
+next install_system_packages "$DOTFILES_PACMAN_PACKAGES"
+next install_repo
+next install_nvim
+next install_zsh
+next install_rustup
 
 # Save the conf
-printf "$DOTFILES_STATUS_OUT" > $DOTFILES_STATUS_FILE
+printf "$DOTFILES_CONFIG_OUT" > $DOTFILES_CONFIG_FILE
+printf "source ${DOTFILES_CONFIG_FILE}" > .zshenv

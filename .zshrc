@@ -1,4 +1,4 @@
-autoload -U compinit && compinit
+autoload -U compinit compaudit
 
 export ZSH="${HOME}/.zsh"
 ZSH_CACHE_DIR="$ZSH/cache"
@@ -30,7 +30,7 @@ alias v=nvim
 alias g=git
 alias icat="kitty +kitten icat" # display image in terminal
 alias d="nvim -d" # diff files
-alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME' # handle dotfiles
+alias config='/usr/bin/git --git-dir=${DOTFILES_REPO} --work-tree=$HOME' # handle dotfiles
 alias cmake="cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1"
 if [ "$TERM" = "xterm-kitty" ]
 then;
