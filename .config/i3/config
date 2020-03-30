@@ -211,3 +211,23 @@ bindsym XF86MonBrightnessUp exec "light -A 5; b=$(light -G); notify-send -u low 
 bindsym XF86MonBrightnessDown exec "light -U 5; b=$(light -G); notify-send -u low -t 500 \\"Brightness: ${b: : -3}\\""
 
 bindsym $mod+shift+Return exec firefox
+
+### INIT WORKSPACE FOR WORK
+workspace $ws1 output DVI-D-0
+workspace $ws8 output DP-0
+workspace $ws9 output DP-0
+workspace $ws10 output DP-0
+exec --no-startup-id sleep 5; xset dpms 300 300 300
+exec --no-startup-id i3-msg "workspace "$ws10"; append_layout /home/lesur/.config/i3/ws10.json"
+exec --no-startup-id i3-msg "workspace "$ws8"; append_layout /home/lesur/.config/i3/ws8.json"
+exec --no-startup-id i3-msg "workspace "$ws9"; append_layout /home/lesur/.config/i3/ws9.json"
+exec --no-startup-id i3-msg "workspace "$ws1"; append_layout /home/lesur/.config/i3/ws1.json"
+exec mattermost
+exec kitty
+exec thunderbird
+exec firefox
+
+# force opencv imshow to be floating...
+for_window [class="0"] floating enable
+for_window [class="Mynteye exposition slider"] floating enable
+for_window [class="Mynteye exposition slider"] border normal
