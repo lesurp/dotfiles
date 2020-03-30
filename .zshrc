@@ -43,3 +43,34 @@ export FZF_DEFAULT_OPTS="--color=light"
 export CMAKE_EXPORT_COMPILE_COMMANDS=1
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 alias rcp="rsync -avhW --no-compress --progress"
+
+export DTSETS=$HOME/Datasets
+export CMAKE_PREFIX_PATH="/opt/opencv_3/opencv-3.4.7/build"
+export PYTHONPATH=/opt/opencv_3/install/lib/python3.7/site-packages
+
+function b {
+    cd build
+    local cd_exit_code=$?
+    make -j16 || ninja
+    local build_exit_code=$?
+    if [ $cd_exit_code -eq 0 ]; then
+        cd -
+    fi
+    return $build_exit_code
+}
+
+function vssh() {
+    nvim scp://$1/$2
+}
+
+function nvrssh() {
+    nvr scp://$1/$2
+}
+
+export LD_LIBRARY_PATH="/usr/local/cuda/lib64"
+# python3.7 (built from source)
+export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
+# opencv...
+export LD_LIBRARY_PATH="/opt/opencv_3/install/lib:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/TensorRT-7.0.0.11/lib"
+export PATH="/usr/local/cuda/bin:$PATH"
