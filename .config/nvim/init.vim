@@ -2,7 +2,7 @@
 """ COMMON SENSE """
 """"""""""""""""""""
 " makes startup time MUCH FASTER
-let g:python3_host_prog="/usr/bin/python3"
+let g:python3_host_prog="/usr/local/bin/python3.7"
 
 " disable auto executed vimscript (fucking RCE waiting to happen)
 set nomodeline
