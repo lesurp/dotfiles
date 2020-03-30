@@ -15,12 +15,16 @@ prompt_setup_MEINE_THEME(){
 }
 
 prompt_MEINE_THEME_precmd(){
-  if [ -z "$VIRTUAL_ENV" ]
+  if [ -n "$VIRTUAL_ENV" ]
   then
-    virtualenv_info=""
+    virtualenv_info="(`basename $VIRTUAL_ENV`) "
+  elif [ -n "$CONDA_DEFAULT_ENV" ]
+  then
+    virtualenv_info="($CONDA_DEFAULT_ENV) "
   else
-    virtualenv_info="%{$fg[green]%}(`basename $VIRTUAL_ENV`) %{$reset_color%}"
+    virtualenv_info=""
   fi
+  virtualenv_info="%{$fg[green]%}${virtualenv_info}%{$reset_color%}"
 
   local gitinfo=$(git_prompt_info)
   local gitinfo_nocolor=$(echo "$gitinfo" | perl -pe "s/%\{[^}]+\}//g")
