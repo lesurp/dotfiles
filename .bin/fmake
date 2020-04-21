@@ -100,7 +100,7 @@ find_cmakelists
 check_existing_programs
 select_build_type $2
 
-cmd="cmake -DCMAKE_BUILD_TYPE=$build_type -DCMAKE_EXPORT_COMPILE_COMMANDS=1 $maybe_ccache $generator $cmakefile_dir"
+cmd="cmake -DCMAKE_TOOLCHAIN_FILE=/opt/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=$build_type $maybe_ccache $generator $cmakefile_dir"
 
 output=`$cmd 2>&1`
 
