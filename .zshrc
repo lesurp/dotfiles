@@ -74,3 +74,22 @@ export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH="/opt/opencv_3/install/lib:$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/TensorRT-7.0.0.11/lib"
 export PATH="/usr/local/cuda/bin:$PATH"
+export TensorRT_DIR=/opt/TensorRT-7.0.0.11
+function cmake_vcpkg {
+    cmake -DCMAKE_TOOLCHAIN_FILE=/opt/vcpkg/scripts/buildsystems/vcpkg.cmake "$@"
+}
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/home/lesur/miniconda2/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/home/lesur/miniconda2/etc/profile.d/conda.sh" ]; then
+        . "/home/lesur/miniconda2/etc/profile.d/conda.sh"
+    else
+        export PATH="/home/lesur/miniconda2/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
