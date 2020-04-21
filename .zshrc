@@ -31,7 +31,6 @@ alias g=git
 alias icat="kitty +kitten icat" # display image in terminal
 alias d="nvim -d" # diff files
 alias config='/usr/bin/git --git-dir=${DOTFILES_REPO} --work-tree=$HOME' # handle dotfiles
-alias cmake="cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1"
 if [ "$TERM" = "xterm-kitty" ]
 then;
     alias ssh="kitty +kitten ssh"
@@ -41,5 +40,6 @@ export GIT_EDITOR='nvr -s --remote-wait-silent'
 export FZF_DEFAULT_COMMAND='rg --files --glob "!third_party/*"'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_DEFAULT_OPTS="--color=light"
+export CMAKE_EXPORT_COMPILE_COMMANDS=1
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 export rcp="rsync -avhW --no-compress --progress"
