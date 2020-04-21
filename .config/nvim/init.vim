@@ -76,6 +76,9 @@ autocmd BufWinEnter,WinEnter term://* startinsert
 " ... and leave it when leaving the panel
 autocmd BufLeave term://* stopinsert
 
+" display relative file numbers in terminal
+au TermOpen * setlocal nonumber relativenumber
+
 " close nvr when closing git commands editor from terminal
 autocmd FileType gitcommit,gitrebase,gitconfig set bufhidden=delete
 
@@ -147,7 +150,7 @@ Plug 'altercation/vim-colors-solarized'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'lesurp/vim_spell_checker_rotation'
-Plug 'lesurp/git-blame.vim'
+"Plug 'lesurp/git-blame.vim'
 
 Plug 'sakhnik/nvim-gdb', { 'do': ':!./install.sh \| UpdateRemotePlugins' }
 
@@ -214,7 +217,7 @@ function! s:blame_if_no_term()
 
     call gitblame#echo()
 endfunction
-autocmd CursorHold * call s:blame_if_no_term()
+"autocmd CursorHold * call s:blame_if_no_term()
 
 """"""""""""""""""""""""" SPELLCHECKROTATE CONFIG
 nnoremap <leader>sp :<C-U>call SpellCheckRotate(v:count)<cr>
@@ -233,12 +236,13 @@ nmap <silent> ]g <Plug>(coc-diagnostic-next)
 
 nnoremap <silent> gc :CocList<CR>
 nnoremap <silent> gd :call CocAction('jumpDefinition')<CR>
+nnoremap <silent> gt :call CocAction('jumpDefinition', 'tab drop')<CR>
 nnoremap <silent> ge :CocList diagnostics<CR>
-nnoremap <silent> gf :CocFix<CR>
 nnoremap <silent> gs :CocList outline<CR>
 nnoremap <silent> gr :call CocAction('jumpReferences')<CR>
+"nnoremap <silent> gf :CocAction('quickfix')<cr>
+nnoremap <silent> gf :CocFix<CR>
 nmap <silent> gh :call CocAction('doHover')<CR>
-nmap <silent> gx <Plug>(coc-fix-current)
 " how do I get this?
 "nnoremap <silent> gv :call CocAction('preview')<CR>
 nnoremap <silent> <F2> :call CocAction('rename')<CR>
