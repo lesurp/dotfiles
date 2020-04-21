@@ -1,5 +1,4 @@
 {
-    "coc.preferences.jumpCommand": "tab drop",
     "languageserver": {
         "clangd": {
             "command": "clangd",
@@ -7,23 +6,23 @@
             "rootPatterns": ["compile_flags.txt", "compile_commands.json", ".vim/", ".git/", ".hg/"],
             "filetypes": ["c", "cpp", "h", "hpp", "objc", "objcpp"]
         },
-        "rust": {
-          "command": "rust-analyzer",
-          "filetypes": ["rust"],
-          "rootPatterns": ["Cargo.toml"]
+        "cmake": {
+            "command": "cmake-language-server",
+            "filetypes": ["cmake"],
+            "rootPatterns": [
+                "build/",
+                "CMakeLists.txt"
+            ],
+            "initializationOptions": {
+                "buildDirectory": "build"
+            }
         }
     },
-    "python.linting.pylintArgs": [
-        "--generated-members=cv2.*",
-        "--extension-pkg-whitelist=cv2",
-        "--disable=missing-class-docstring",
-        "--disable=missing-function-docstring",
-        "--disable=invalid-name"
-    ],
-    "rust-analyzer.cargo-watch.command": "clippy",
-    "rust-analyzer.cargo-watch.arguments": ["--all"],
     "diagnostic.errorSign" : "🍎",
     "diagnostic.warningSign" : "🍌",
     "diagnostic.infoSign" : "🥒",
-    "diagnostic.hintSign" : "💙"
+    "diagnostic.hintSign" : "💙",
+    "diagnostic.separateRelatedInformationAsDiagnostics" : true,
+    "diagnostic.virtualText": true,
+    "codeLens.enable": true
 }
