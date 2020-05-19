@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# curl -s https://raw.githubusercontent.com/lesurp/dotfiles/master/.bin/vasygros | bash
+# curl -s https://raw.githubusercontent.com/lesurp/dotfiles/master/.dotfiles/bin/dotfiles | bash
 
 # sets the function ctr_c as a callback when SIGINT (^C) is received
 trap ctrl_c INT
@@ -34,9 +34,15 @@ EOF
 DOTFILES_UPSTREAM_REPO=https://github.com/lesurp/dotfiles
 DOTFILES_HOME=$HOME/.dotfiles
 DOTFILES_REPO=$DOTFILES_HOME/repo
+DOTFILES_BINARY_DIR=$DOTFILES_HOME/bin
+DOTFILES_INSTALL_DIR=$DOTFILES_HOME/install
 DOTFILES_CONFIG_FILE=$DOTFILES_HOME/config
 if [ -f $DOTFILES_CONFIG_FILE ]; then
     source $DOTFILES_CONFIG_FILE
+else
+    # if the config file does not exist, assume first run (and create dirs etc.)
+    mkdir -p $DOTFILES_BINARY_DIR
+    mkdir -p $DOTFILES_INSTALL_DIR
 fi
 
 
@@ -44,12 +50,13 @@ fi
 # We stores its value to the above file
 DOTFILES_CONFIG_OUT=""
 append_config() {
-    DOTFILES_CONFIG_OUT+="$1=${!1}\n"
+    DOTFILES_CONFIG_OUT+="export $1=${!1}\n"
 }
 
-append_config DOTFILES_HOME
-append_config DOTFILES_REPO
-append_config DOTFILES_UPSTREAM_REPO
+# we store those in the conf because the variables are sourced on session startup
+append_config DOTFILES_BINARY_DIR # when setting up the path
+append_config DOTFILES_REPO       # config git alias
+append_config DOTFILES_HOME       # just in case
 
 # Each config should use this when saving state
 # Don't forget that the variables may be empty!
@@ -152,10 +159,11 @@ install_system_packages() {
 ############################################## SYSTEM PACKAGE INSTALL END
 
 ############################################## INSTALL NEOVIM
-NVIM_LOCATION=$HOME/.bin/nvim
+NVIM_LOCATION=$DOTFILES_BINARY_DIR/nvim
 NVIM_CONFIG_DIR=$HOME/.config/nvim
 
 install_nvim() {
+    # TODO: check commit of the nightly-release to avoid redownloading same version every run
     wget https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage -O $NVIM_LOCATION
     chmod +x $NVIM_LOCATION
 
@@ -172,8 +180,8 @@ install_nvim() {
 }
 
 ############################################## INSTALL KITTY
-KITTY_INSTALL=$HOME/.bin/kitty_install
-KITTY_BINARY=$HOME/.bin/kitty
+KITTY_INSTALL=$DOTFILES_INSTALL_DIR/kitty
+KITTY_BINARY=$DOTFILES_BINARY_DIR/kitty
 KITTY_REPO=kovidgoyal/kitty
 install_kitty() {
     local latest_tag=`github_latest_tag ${KITTY_REPO}`
@@ -196,7 +204,6 @@ install_kitty() {
 }
 
 ############################################## INSTALL CONFIG
-
 install_repo() {
     if [ "$DOTFILES_CONFIG_REPO_INSTALLED" == $TRUE ]; then
         printf "Repository was already cloned, nothing else to do here.\n"
@@ -219,6 +226,7 @@ install_repo() {
     else
         branch_name=master
     fi
+    # Note that this does not delete uncommitted changes!
     $config checkout -B ${branch_name}
 
     printf "Set dotfiles' configuration branch to ${branch_name}\n"
@@ -273,4 +281,3 @@ next install_rustup
 
 # Save the conf
 printf "$DOTFILES_CONFIG_OUT" > $DOTFILES_CONFIG_FILE
-printf "source ${DOTFILES_CONFIG_FILE}" > .zshenv
