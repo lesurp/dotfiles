@@ -26,6 +26,7 @@ EOF
 # Those are to be installed with cargo
 read -d '' DOTFILES_CARGO_PACKAGES << EOF
 ripgrep
+cargo-edit
 EOF
 
 
@@ -227,9 +228,10 @@ install_rustup() {
     rustup component add rust-src
     rustup completions zsh > $DOTFILES_ZSH_COMPLETIONS/_rustup
     rustup completions zsh cargo > $DOTFILES_ZSH_COMPLETIONS/_cargo
-    cargo install "${DOTFILES_CARGO_PACKAGES}"
+    local packages=$(sed 's/ /\n/g' <<< "${DOTFILES_CARGO_PACKAGES}")
+    echo "$packages" | xargs -I{} cargo install {}
 
-    printf "Update/installation finished\n"
+    printf "Update/installation of rust toolchain/packages finished\n"
 
     append_config DOTFILES_CONFIG_RUSTUP_INSTALLED
 }
