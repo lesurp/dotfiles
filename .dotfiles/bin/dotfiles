@@ -281,3 +281,4 @@ next install_rustup
 
 # Save the conf
 printf "$DOTFILES_CONFIG_OUT" > $DOTFILES_CONFIG_FILE
+printf "source ${DOTFILES_CONFIG_FILE}" > .zshenv
