@@ -3,7 +3,9 @@
 skip_global_compinit=1
 
 # My stuff
+source $HOME/.dotfiles/config # why tf do I need this when .zshenv sources it?!
 PATH="$HOME/.bin:$PATH"
+PATH="${DOTFILES_BINARY_DIR}:$PATH"
 PATH="$HOME/.bin/git-aliases:$PATH"
 # Obv
 PATH="$HOME/.cargo/bin:$PATH"
