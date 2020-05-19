@@ -21,6 +21,9 @@ prompt_MEINE_THEME_precmd(){
   elif [ -n "$CONDA_DEFAULT_ENV" ]
   then
     virtualenv_info="($CONDA_DEFAULT_ENV) "
+  elif [ -n "$ROS_DISTRO" ]
+  then
+    virtualenv_info="(ROS - $ROS_DISTRO) "
   else
     virtualenv_info=""
   fi
