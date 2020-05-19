@@ -117,6 +117,10 @@ find_install_cmd() {
     esac
 }
 
+github_latest_tag() {
+    curl --silent "https://api.github.com/repos/$1/releases/latest" | sed -n 's/^.*"tag_name": "\(.*\)".*$/\1/p'
+}
+
 initialize_package_manager() {
     find_package_manager
     # used to update the package list, and upgrade the packages themselves
@@ -165,6 +169,30 @@ install_nvim() {
 
     DOTFILES_CONFIG_NVIM_INSTALLED=$TRUE
     append_config DOTFILES_CONFIG_NVIM_INSTALLED
+}
+
+############################################## INSTALL KITTY
+KITTY_INSTALL=$HOME/.bin/kitty_install
+KITTY_BINARY=$HOME/.bin/kitty
+KITTY_REPO=kovidgoyal/kitty
+install_kitty() {
+    local latest_tag=`github_latest_tag ${KITTY_REPO}`
+    # remove first letter of the tag (which is the 'v' in front of the actualy version number)
+    latest_tag=${latest_tag#?};
+    local kitty_download_link="https://github.com/${KITTY_REPO}/releases/download/v${latest_tag}/kitty-${latest_tag}-x86_64.txz"
+    if [ -z "$DOTFILES_CONFIG_KITTY_VERSION" ]; then
+        printf "Installing kitty version ${latest_tag}"
+        mkdir ${KITTY_INSTALL}
+        wget -qO- https://github.com/${KITTY_REPO}/releases/download/v${latest_tag}/kitty-${latest_tag}-x86_64.txz | tar -xJ -C ${KITTY_INSTALL}
+        ln -s ${KITTY_INSTALL}/bin/kitty ${KITTY_BINARY}
+    elif [ "$DOTFILES_CONFIG_KITTY_VERSION" != "${latest_tag}" ]; then
+        printf "Upgrading to kitty version ${latest_tag}"
+    else
+        printf "Kitty already up-to-date"
+    fi
+
+    DOTFILES_CONFIG_KITTY_VERSION=${latest_tag}
+    append_config DOTFILES_CONFIG_KITTY_VERSION
 }
 
 ############################################## INSTALL CONFIG
@@ -240,6 +268,7 @@ next install_system_packages "$DOTFILES_PACMAN_PACKAGES"
 next install_repo
 next install_nvim
 next install_zsh
+next install_kitty
 next install_rustup
 
 # Save the conf
