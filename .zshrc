@@ -42,4 +42,4 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_DEFAULT_OPTS="--color=light"
 export CMAKE_EXPORT_COMPILE_COMMANDS=1
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-export rcp="rsync -avhW --no-compress --progress"
+alias rcp="rsync -avhW --no-compress --progress"
