@@ -22,7 +22,6 @@
     "diagnostic.warningSign" : "🍌",
     "diagnostic.infoSign" : "🥒",
     "diagnostic.hintSign" : "💙",
-    "diagnostic.separateRelatedInformationAsDiagnostics" : true,
     "diagnostic.virtualText": true,
     "codeLens.enable": true
 }
