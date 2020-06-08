@@ -3,7 +3,7 @@
 skip_global_compinit=1
 
 # My stuff
-. $HOME/.dotfiles/config # why tf do I need this when .zshenv sources it?!
+. $HOME/.dotfiles/config
 
 PATH="${DOTFILES_BINARY_DIR}:$PATH"
 PATH="${DOTFILES_BINARY_DIR}/git-aliases:$PATH"
