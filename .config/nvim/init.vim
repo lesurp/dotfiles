@@ -130,16 +130,18 @@ call setreg('l', "f,ls")
 let g:location_list_open = 0
 function! LocationListToggle()
     if g:location_list_open == 0
-        :silent! lopen
+        lopen
         let g:location_list_open = 1
     else
-        :silent! lclose
+        lclose
         let g:location_list_open = 0
     endif
 endfunction
 
 " replace the default "man" by cppman (for cpp source files only)
 autocmd FileType cpp set keywordprg=:term\ cppman
+
+nnoremap <leader>ll :call LocationListToggle()<CR>
 
 """"""""" PLUGINS
 call plug#begin()
@@ -240,7 +242,7 @@ nnoremap <silent> gt :call CocAction('jumpDefinition', 'tab drop')<CR>
 nnoremap <silent> ge :CocList diagnostics<CR>
 nnoremap <silent> gs :CocList outline<CR>
 nnoremap <silent> gr :call CocAction('jumpReferences')<CR>
-"nnoremap <silent> gf :CocAction('quickfix')<cr>
+nnoremap <silent> gx :CocAction('quickfix')<cr>
 nnoremap <silent> gf :CocFix<CR>
 nmap <silent> gh :call CocAction('doHover')<CR>
 " how do I get this?
