@@ -214,18 +214,21 @@ install_repo() {
     git clone --bare $DOTFILES_UPSTREAM_REPO $DOTFILES_REPO
     config="git --git-dir=${DOTFILES_REPO} --work-tree=${HOME}"
     $config config status.showUntrackedFiles no
+    branch_name=master
+    ## FIXME: this doesn't actually work when piping through curl?
+    ## i.e. it's always detected as being interactive which obv. fucks up everything
     # if this is an interactive shell, prompt the user for a new branch name for this config
-    if [ -t 1 ]; then
-        echo "The existing configurations are:"
-        $config branch -a | tail -n +2 | cut -d"/" -f2
-        printf "Enter a desired configuration branch.\n"
-        read -p "If it doesn't exist, it will be created based on master. " branch_name
-        if [ -z "${branch_name}" ]; then
-            branch_name=master
-        fi
-    else
-        branch_name=master
-    fi
+    #if [ -t 1 ]; then
+    #    echo "The existing configurations are:"
+    #    $config branch -a | tail -n +2 | cut -d"/" -f2
+    #    printf "Enter a desired configuration branch.\n"
+    #    read -p "If it doesn't exist, it will be created based on master. " branch_name
+    #    if [ -z "${branch_name}" ]; then
+    #        branch_name=master
+    #    fi
+    #else
+    #    branch_name=master
+    #fi
     # Note that this does not delete uncommitted changes!
     $config checkout -B ${branch_name}
 
