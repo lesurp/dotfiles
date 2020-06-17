@@ -24,5 +24,6 @@
     "diagnostic.hintSign" : "💙",
     "diagnostic.separateRelatedInformationAsDiagnostics" : true,
     "diagnostic.virtualText": true,
-    "codeLens.enable": true
+    "codeLens.enable": true,
+    "rust-analyzer.checkOnSave.command": "clippy"
 }
