@@ -159,7 +159,7 @@ Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 
 " lsp
-Plug 'neoclide/coc.nvim', {'do': './install.sh nightly'}
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 call plug#end()
 
