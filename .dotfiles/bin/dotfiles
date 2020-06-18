@@ -16,8 +16,18 @@
 # sets the function ctr_c as a callback when SIGINT (^C) is received
 trap ctrl_c INT
 ctrl_c() {
-    printf "SIGINT received - aborting!\n"
+    printf "SIGINT received - saving the conf then aborting!\n"
+    save_conf
     exit 1
+}
+
+save_conf() {
+    printf "$DOTFILES_CONFIG_OUT" > $DOTFILES_CONFIG_FILE
+    printf "source ${DOTFILES_CONFIG_FILE}" > $HOME/.zshenv
+    # If login shell is zsh, .profile is ignored
+    # If it is *not* zsh (lightdm or gdm BS) then .profile is sourced but not
+    # .zprofile, so this line ensures we source it once not matter what
+    ln -s $HOME/.zprofile $HOME/.profile
 }
 
 # fuse2 is erquired to run nvim from the AppImage
@@ -293,6 +303,4 @@ next install_zsh
 next install_kitty
 next install_rustup
 
-# Save the conf
-printf "$DOTFILES_CONFIG_OUT" > $DOTFILES_CONFIG_FILE
-printf "source ${DOTFILES_CONFIG_FILE}" > .zshenv
+save_conf
