@@ -35,7 +35,7 @@ save_conf() {
 # xclip for clipboard support
 # cppman is an offline cpp std lib documentation
 read -d '' DOTFILES_PACMAN_PACKAGES << EOF
-wget curl sudo zsh git kitty which firefox xorg-xinit python-pip
+wget curl sudo zsh git which firefox xorg-xinit python-pip
 
 i3 dmenu network-manager network-manager-applet dunst
 
@@ -48,6 +48,8 @@ EOF
 read -d '' DOTFILES_CARGO_PACKAGES << EOF
 ripgrep
 cargo-edit
+fd-find
+cargo-tarpaulin
 EOF
 
 
