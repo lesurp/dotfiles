@@ -2,6 +2,17 @@
 
 # curl -s https://raw.githubusercontent.com/lesurp/dotfiles/master/.dotfiles/bin/dotfiles | bash
 
+## Notes regarding zshenv / zprofile BS:
+# zshenv:
+#   - is loaded *each shell*
+#   - is **NOT** loaded by the login shell
+#     this means that setting PATH in there will NOT be visible to e.g. i3 / dmenu
+#
+# zprofile:
+#   - is loaded *once* (i.e. need to logout to apply changes)
+#   - is loaded before starting i3, so setting the path there works
+
+
 # sets the function ctr_c as a callback when SIGINT (^C) is received
 trap ctrl_c INT
 ctrl_c() {
