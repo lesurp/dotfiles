@@ -27,6 +27,7 @@ save_conf() {
     # If login shell is zsh, .profile is ignored
     # If it is *not* zsh (lightdm or gdm BS) then .profile is sourced but not
     # .zprofile, so this line ensures we source it once not matter what
+    rm -f $HOME/.profile
     ln -s $HOME/.zprofile $HOME/.profile
 }
 
