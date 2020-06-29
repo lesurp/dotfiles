@@ -212,19 +212,23 @@ install_kitty() {
     # remove first letter of the tag (which is the 'v' in front of the actualy version number)
     latest_tag=${latest_tag#?};
     local kitty_download_link="https://github.com/${KITTY_REPO}/releases/download/v${latest_tag}/kitty-${latest_tag}-x86_64.txz"
-    local kitty_dl_cmd="wget -qO- https://github.com/${KITTY_REPO}/releases/download/v${latest_tag}/kitty-${latest_tag}-x86_64.txz | tar -xJ -C ${KITTY_INSTALL}"
+    function _kitty_dl() {
+        wget -qO- https://github.com/${KITTY_REPO}/releases/download/v${latest_tag}/kitty-${latest_tag}-x86_64.txz | tar -xJ -C ${KITTY_INSTALL}
+    }
     if [ -z "$DOTFILES_CONFIG_KITTY_VERSION" ]; then
-        printf "Installing kitty version ${latest_tag}"
+        printf "Installing kitty version ${latest_tag}\n"
         mkdir ${KITTY_INSTALL}
-        $kitty_dl_cmd
+        _kitty_dl
         ln -s ${KITTY_INSTALL}/bin/kitty ${KITTY_BINARY}
     elif [ "$DOTFILES_CONFIG_KITTY_VERSION" != "${latest_tag}" ]; then
         printf "Upgrading to kitty version ${latest_tag}\n"
-        $kitty_dl_cmd
+        rm -r ${KITTY_INSTALL}
+        _kitty_dl
     else
-        printf "Kitty already up-to-date"
+        printf "Kitty already up-to-date\n"
     fi
 
+    unset _kitty_dl
     DOTFILES_CONFIG_KITTY_VERSION=${latest_tag}
     append_config DOTFILES_CONFIG_KITTY_VERSION
 }
