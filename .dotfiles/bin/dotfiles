@@ -237,7 +237,11 @@ install_repo() {
         return
     fi
 
-    git clone --bare $DOTFILES_UPSTREAM_REPO $DOTFILES_REPO
+    mkdir $DOTFILES_REPO
+    cd $DOTFILES_REPO
+    git init --bare
+    git remote add origin $DOTFILES_UPSTREAM_REPO
+    cd -
     config="git --git-dir=${DOTFILES_REPO} --work-tree=${HOME}"
     $config config status.showUntrackedFiles no
     branch_name=master
