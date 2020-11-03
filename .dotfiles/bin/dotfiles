@@ -298,7 +298,7 @@ install_rustup() {
     rustup completions zsh > $DOTFILES_ZSH_COMPLETIONS/_rustup
     rustup completions zsh cargo > $DOTFILES_ZSH_COMPLETIONS/_cargo
     local packages=$(sed 's/ /\n/g' <<< "${DOTFILES_CARGO_PACKAGES}")
-    echo "$packages" | xargs -I{} cargo install {}
+    echo "$packages" | xargs -I{} $HOME/.cargo/bin/cargo install {}
 
     printf "Update/installation of rust toolchain/packages finished\n"
 
