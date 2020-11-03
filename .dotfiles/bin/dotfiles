@@ -23,12 +23,6 @@ ctrl_c() {
 
 save_conf() {
     printf "$DOTFILES_CONFIG_OUT" > $DOTFILES_CONFIG_FILE
-    printf "source ${DOTFILES_CONFIG_FILE}" > $HOME/.zshenv
-    # If login shell is zsh, .profile is ignored
-    # If it is *not* zsh (lightdm or gdm BS) then .profile is sourced but not
-    # .zprofile, so this line ensures we source it once not matter what
-    rm -f $HOME/.profile
-    ln -s $HOME/.zprofile $HOME/.profile
 }
 
 # fuse2 is erquired to run nvim from the AppImage
@@ -75,6 +69,7 @@ fi
 DOTFILES_CONFIG_OUT=""
 append_config() {
     DOTFILES_CONFIG_OUT+="export $1=${!1}\n"
+    save_conf
 }
 
 # we store those in the conf because the variables are sourced on session startup
@@ -305,11 +300,18 @@ install_rustup() {
     append_config DOTFILES_CONFIG_RUSTUP_INSTALLED
 }
 
+
+# TODO put in a function
+# If login shell is zsh, .profile is ignored
+# If it is *not* zsh (lightdm or gdm BS) then .profile is sourced but not
+# .zprofile, so this line ensures we source it once not matter what
+printf "source ${DOTFILES_CONFIG_FILE}" > $HOME/.zshenv
+rm -f $HOME/.profile
+ln -s $HOME/.zprofile $HOME/.profile
+
 next install_system_packages "$DOTFILES_PACMAN_PACKAGES"
 next install_repo
 next install_nvim
 next install_zsh
 next install_kitty
 next install_rustup
-
-save_conf
