@@ -2,7 +2,7 @@
 
 i3-msg "append_layout $HOME/.config/i3/matrix4.json"
 sleep 0.01
-kitty &
-kitty &
-kitty &
-kitty &
+kitty -d="$1" &
+kitty -d="$1" &
+kitty -d="$1" &
+kitty -d="$1" &

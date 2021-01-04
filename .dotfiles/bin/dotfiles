@@ -222,7 +222,7 @@ install_kitty() {
         ln -s ${KITTY_INSTALL}/bin/kitty ${KITTY_BINARY}
     elif [ "$DOTFILES_CONFIG_KITTY_VERSION" != "${latest_tag}" ]; then
         printf "Upgrading to kitty version ${latest_tag}\n"
-        rm -r ${KITTY_INSTALL}
+        rm -r ${KITTY_INSTALL}/*
         _kitty_dl
     else
         printf "Kitty already up-to-date\n"
