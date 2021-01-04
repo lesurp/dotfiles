@@ -63,6 +63,13 @@ inoremap <C-S-v> "+p
 xnoremap <C-p> p
 xnoremap p "_dP
 
+" resize splits using arrow keys
+nnoremap <silent> <C-Right> :vertical resize +5<CR>
+nnoremap <silent> <C-Left> :vertical resize -5<CR>
+nnoremap <silent> <C-Up> :resize +5<CR>
+nnoremap <silent> <C-Down> :resize -5<CR>
+
+
 " spellczeck
 autocmd BufNewFile,BufRead *.tex set spell textwidth=80
 autocmd BufNewFile,BufRead *.md set spell textwidth=80
@@ -163,6 +170,8 @@ Plug 'honza/vim-snippets'
 " lsp
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
+Plug 'peterhoeg/vim-qml'
+
 call plug#end()
 
 """"""""""""""""""""""""" THEMING
@@ -237,17 +246,17 @@ nmap <silent> [g <Plug>(coc-diagnostic-prev)
 nmap <silent> ]g <Plug>(coc-diagnostic-next)
 
 nnoremap <silent> gc :CocList<CR>
-nnoremap <silent> gd :call CocAction('jumpDefinition')<CR>
-nnoremap <silent> gt :call CocAction('jumpDefinition', 'tab drop')<CR>
+nnoremap <silent> gd :call CocActionAsync('jumpDefinition')<CR>
+nnoremap <silent> gt :call CocActionAsync('jumpDefinition', 'tab drop')<CR>
 nnoremap <silent> ge :CocList diagnostics<CR>
 nnoremap <silent> gs :CocList outline<CR>
-nnoremap <silent> gr :call CocAction('jumpReferences')<CR>
-nnoremap <silent> gx :CocAction('quickfix')<cr>
+nnoremap <silent> gr :call CocActionAsync('jumpReferences')<CR>
+nnoremap <silent> gx :CocActionAsync('quickfix')<cr>
 nnoremap <silent> gf :CocFix<CR>
-nmap <silent> gh :call CocAction('doHover')<CR>
+nmap <silent> gh :call CocActionAsync('doHover')<CR>
 " how do I get this?
-"nnoremap <silent> gv :call CocAction('preview')<CR>
-nnoremap <silent> <F2> :call CocAction('rename')<CR>
+"nnoremap <silent> gv :call CocActionAsync('preview')<CR>
+nnoremap <silent> <F2> :call CocActionAsync('rename')<CR>
 
 " hihglight other instance of the varialbe we chill on
 autocmd CursorHold * silent call CocActionAsync('highlight')
@@ -258,4 +267,5 @@ inoremap <silent><expr> <c-s> pumvisible() ? coc#_select_confirm() :
 
 " if file sypported by CoC, run the global / selected formatting, otherwise
 " run gg=G
-nnoremap <expr> <leader>ff CocHandled() ? "gg=G''" : ":call CocAction('format')<CR>" 
+nmap <expr> <leader>ff CocHandled() ? "gg=G''" : ":call CocActionAsync('format')<CR>" 
+vmap <leader>ff <Plug>(coc-format-selected)
