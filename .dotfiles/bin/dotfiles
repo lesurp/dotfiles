@@ -34,7 +34,9 @@ wget curl sudo zsh git which firefox xorg-xinit python-pip
 
 i3 dmenu network-manager network-manager-applet dunst
 
-fuse2 nodejs npm xclip
+fuse2 nodejs npm xclip pkg-config xorg-server
+
+noto-fonts-emoji ttf-fira-code
 
 clang clang++ cppman cmake
 EOF
@@ -236,7 +238,7 @@ install_repo() {
         return
     fi
 
-    git clone $DOTFILES_UPSTREAM_REPO $DOTFILES_REPO
+    git clone --bare $DOTFILES_UPSTREAM_REPO $DOTFILES_REPO
     config="git --git-dir=${DOTFILES_REPO} --work-tree=${HOME}"
     $config config status.showUntrackedFiles no
     branch_name=master
@@ -289,9 +291,10 @@ install_rustup() {
         curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain nightly --no-modify-path
         DOTFILES_CONFIG_RUSTUP_INSTALLED=$TRUE
     fi
-    rustup component add rust-src
-    rustup completions zsh > $DOTFILES_ZSH_COMPLETIONS/_rustup
-    rustup completions zsh cargo > $DOTFILES_ZSH_COMPLETIONS/_cargo
+    rustup="$HOME/.cargo/bin/rustup"
+    $rustup component add rust-src
+    $rustup completions zsh > $DOTFILES_ZSH_COMPLETIONS/_rustup
+    $rustup completions zsh cargo > $DOTFILES_ZSH_COMPLETIONS/_cargo
     local packages=$(sed 's/ /\n/g' <<< "${DOTFILES_CARGO_PACKAGES}")
     echo "$packages" | xargs -I{} $HOME/.cargo/bin/cargo install {}
 
