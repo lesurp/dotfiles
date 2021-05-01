@@ -1,14 +1,13 @@
 autoload -U compinit compaudit
 
-export ZSH="${HOME}/.zsh"
-ZSH_CACHE_DIR="$ZSH/cache"
+ZSH_CACHE_DIR="$DOTFILES_ZSH_HOME/cache"
 SHORT_HOST=${HOST/.*/}
-ZSH_COMPDUMP="${ZDOTDIR:-${HOME}}/.zcompdump-${SHORT_HOST}-${ZSH_VERSION}"
+ZSH_COMPDUMP="${HOME}/.zcompdump-${SHORT_HOST}-${ZSH_VERSION}"
 
 # add a function path
-fpath=($ZSH/functions $ZSH/completions $fpath)
+fpath=($DOTFILES_ZSH_HOME/completions $fpath)
 
-for config_file ($ZSH/lib/*.zsh); do
+for config_file ($DOTFILES_ZSH_HOME/lib/*.zsh); do
   source $config_file
 done
 
@@ -23,7 +22,7 @@ else
 fi
 
 # Load the theme
-source $ZSH/theme
+source $DOTFILES_ZSH_HOME/theme
 
 ### QoL / theming
 alias v=nvim
