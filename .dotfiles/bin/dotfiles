@@ -23,12 +23,6 @@ ctrl_c() {
 
 save_conf() {
     printf "$DOTFILES_CONFIG_OUT" > $DOTFILES_CONFIG_FILE
-    printf "source ${DOTFILES_CONFIG_FILE}" > $HOME/.zshenv
-    # If login shell is zsh, .profile is ignored
-    # If it is *not* zsh (lightdm or gdm BS) then .profile is sourced but not
-    # .zprofile, so this line ensures we source it once not matter what
-    rm -f $HOME/.profile
-    ln -s $HOME/.zprofile $HOME/.profile
 }
 
 # fuse2 is erquired to run nvim from the AppImage
@@ -40,7 +34,11 @@ wget curl sudo zsh git which firefox xorg-xinit python-pip
 
 i3 dmenu network-manager network-manager-applet dunst
 
-fuse2 nodejs npm xclip
+fuse2 nodejs npm xclip pkg-config xorg-server
+
+noto-fonts-emoji ttf-fira-code
+
+patch fakeroot
 
 clang clang++ cppman cmake
 EOF
@@ -75,12 +73,14 @@ fi
 DOTFILES_CONFIG_OUT=""
 append_config() {
     DOTFILES_CONFIG_OUT+="export $1=${!1}\n"
+    save_conf
 }
 
 # we store those in the conf because the variables are sourced on session startup
-append_config DOTFILES_BINARY_DIR # when setting up the path
-append_config DOTFILES_REPO       # config git alias
-append_config DOTFILES_HOME       # just in case
+append_config DOTFILES_BINARY_DIR
+append_config DOTFILES_REPO      
+append_config DOTFILES_HOME       
+append_config DOTFILES_INSTALL_DIR
 
 # Each config should use this when saving state
 # Don't forget that the variables may be empty!
@@ -161,20 +161,15 @@ initialize_package_manager() {
     root "$update_cmd"
 }
 
-# also setup zsh as the user's default shell
-install_packages() {
-    # this is needed because xargs SUCKS
-    local packages=$(sed 's/ /\n/g' <<< $@)
-    # avoid stopping on non-existing packages (for different package managers)
-    install_all_pkgs="echo \"$packages\" | xargs -I{} $install_cmd {}"
-    root "$install_all_pkgs"
-}
-
-install_system_packages() {
+install_system() {
     initialize_package_manager
 
     if [ "$DOTFILES_CONFIG_SYSTEM_INSTALLED" != $TRUE ]; then
-        install_packages $@
+        # this is needed because xargs SUCKS
+        local packages=$(sed 's/ /\n/g' <<< $DOTFILES_PACMAN_PACKAGES)
+        # avoid stopping on non-existing packages (for different package managers)
+        install_all_pkgs="echo \"$packages\" | xargs -I{} $install_cmd {}"
+        root "$install_all_pkgs"
     fi
 
     DOTFILES_CONFIG_SYSTEM_INSTALLED=$TRUE
@@ -241,11 +236,7 @@ install_repo() {
         return
     fi
 
-    mkdir $DOTFILES_REPO
-    cd $DOTFILES_REPO
-    git init --bare
-    git remote add origin $DOTFILES_UPSTREAM_REPO
-    cd -
+    git clone --bare $DOTFILES_UPSTREAM_REPO $DOTFILES_REPO
     config="git --git-dir=${DOTFILES_REPO} --work-tree=${HOME}"
     $config config status.showUntrackedFiles no
     branch_name=master
@@ -270,10 +261,17 @@ install_repo() {
 
     DOTFILES_CONFIG_REPO_INSTALLED=$TRUE
     append_config DOTFILES_CONFIG_REPO_INSTALLED
+
+    # If login shell is zsh, .profile is ignored
+    # If it is *not* zsh (lightdm or gdm BS) then .profile is sourced but not
+    # .zprofile, so this line ensures we source it once not matter what
+    printf "source ${DOTFILES_CONFIG_FILE}" > $HOME/.zshenv
+    rm -f $HOME/.profile
+    ln -s $HOME/.zprofile $HOME/.profile
 }
 
 ############################################## INSTALL ZSH
-DOTFILES_ZSH_HOME=$HOME/.zsh
+DOTFILES_ZSH_HOME=$DOTFILES_INSTALL_DIR/zsh
 DOTFILES_ZSH_COMPLETIONS=$DOTFILES_ZSH_HOME/completions
 
 install_zsh() {
@@ -298,22 +296,35 @@ install_rustup() {
         curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain nightly --no-modify-path
         DOTFILES_CONFIG_RUSTUP_INSTALLED=$TRUE
     fi
-    rustup component add rust-src
-    rustup completions zsh > $DOTFILES_ZSH_COMPLETIONS/_rustup
-    rustup completions zsh cargo > $DOTFILES_ZSH_COMPLETIONS/_cargo
+    rustup="$HOME/.cargo/bin/rustup"
+    $rustup component add rust-src
+    $rustup completions zsh > $DOTFILES_ZSH_COMPLETIONS/_rustup
+    $rustup completions zsh cargo > $DOTFILES_ZSH_COMPLETIONS/_cargo
     local packages=$(sed 's/ /\n/g' <<< "${DOTFILES_CARGO_PACKAGES}")
-    echo "$packages" | xargs -I{} cargo install {}
+    echo "$packages" | xargs -I{} $HOME/.cargo/bin/cargo install {}
 
     printf "Update/installation of rust toolchain/packages finished\n"
 
     append_config DOTFILES_CONFIG_RUSTUP_INSTALLED
 }
 
-next install_system_packages "$DOTFILES_PACMAN_PACKAGES"
-next install_repo
-next install_nvim
-next install_zsh
-next install_kitty
-next install_rustup
+installers="system zsh repo nvim kitty rustup"
+if [[ $# -eq 0 ]]; then
+    to_be_installed=$installers
+else
+    for installer in $@
+    do
+        if [[ " $installers " =~ " $installer " ]]; then
+            to_be_installed="$to_be_installed $installer"
+        else
+            printf "Install \'$installer\' does not exist; aborting!\n"
+            exit 1
+        fi
+    done
+fi
 
-save_conf
+printf "Installing:$to_be_installed\n"
+for installer in $to_be_installed
+do
+    next install_$installer
+done
