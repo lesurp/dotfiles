@@ -148,7 +148,7 @@ endfunction
 " replace the default "man" by cppman (for cpp source files only)
 autocmd FileType cpp set keywordprg=:term\ cppman
 
-nnoremap <leader>ll :call LocationListToggle()<CR>
+nnoremap <leader>ll :CocDiagnostics<CR>
 
 """"""""" PLUGINS
 call plug#begin()
@@ -163,14 +163,19 @@ Plug 'lesurp/vim_spell_checker_rotation'
 
 Plug 'sakhnik/nvim-gdb', { 'do': ':!./install.sh \| UpdateRemotePlugins' }
 
+
 " snippets
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 
 " lsp
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'jackguo380/vim-lsp-cxx-highlight'
 
 Plug 'peterhoeg/vim-qml'
+Plug 'JuliaEditorSupport/julia-vim'
+
+Plug 'lambdalisue/suda.vim'
 
 call plug#end()
 
@@ -261,7 +266,6 @@ nnoremap <silent> <F2> :call CocActionAsync('rename')<CR>
 " hihglight other instance of the varialbe we chill on
 autocmd CursorHold * silent call CocActionAsync('highlight')
 
-let g:coc_snippet_next = '<C-s>'
 inoremap <silent><expr> <c-s> pumvisible() ? coc#_select_confirm() : 
             \"\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
@@ -269,3 +273,14 @@ inoremap <silent><expr> <c-s> pumvisible() ? coc#_select_confirm() :
 " run gg=G
 nmap <expr> <leader>ff CocHandled() ? "gg=G''" : ":call CocActionAsync('format')<CR>" 
 vmap <leader>ff <Plug>(coc-format-selected)
+
+let g:lsp_cxx_hl_light_bg = 1
+hi default LspCxxHlGroupNamespace ctermfg=167 guifg=#BBBB00 cterm=none gui=none
+hi default link LspCxxHlSymClass LspCxxHlGroupNamespace
+hi default link LspCxxHlSymStruct LspCxxHlGroupNamespace
+hi default link LspCxxHlSymEnum LspCxxHlGroupNamespace
+hi default link LspCxxHlSymTypeAlias LspCxxHlGroupNamespace
+hi default link LspCxxHlSymTypeParameter LspCxxHlGroupNamespace
+hi default LspCxxHlGroupMemberVariable ctermfg=95 guifg=Black
+
+autocmd BufRead,BufNewFile *.jl :set filetype=julia

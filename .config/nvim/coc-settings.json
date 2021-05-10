@@ -1,11 +1,5 @@
 {
     "languageserver": {
-        "clangd": {
-            "command": "clangd",
-            "args": ["-background-index", "-j=4"],
-            "rootPatterns": ["compile_flags.txt", "compile_commands.json", ".vim/", ".git/", ".hg/"],
-            "filetypes": ["c", "cpp", "h", "hpp", "objc", "objcpp"]
-        },
         "cmake": {
             "command": "cmake-language-server",
             "filetypes": ["cmake"],
@@ -25,5 +19,7 @@
     "diagnostic.separateRelatedInformationAsDiagnostics" : true,
     "diagnostic.virtualText": true,
     "codeLens.enable": true,
-    "rust-analyzer.checkOnSave.command": "clippy"
+    "rust-analyzer.checkOnSave.command": "clippy",
+    "clangd.semanticHighlighting": true,
+    "clangd.arguments": ["-background-index", "-j=12"]
 }
