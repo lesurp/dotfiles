@@ -21,5 +21,8 @@
     "codeLens.enable": true,
     "rust-analyzer.checkOnSave.command": "clippy",
     "clangd.semanticHighlighting": true,
-    "clangd.arguments": ["-background-index", "-j=12"]
+    "clangd.arguments": ["-background-index", "-j=12"],
+    "python.formatting.provider": "black",
+    "suggest.enablePreselect": true,
+    "suggest.removeDuplicateItems": true
 }

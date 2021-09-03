@@ -116,6 +116,23 @@ noremap <M-8> 8gt
 noremap <M-9> 9gt
 noremap <M-0> :tabnew<CR>
 
+" copy pasted mindlessly - ignore whitespaces when diff'ing files
+if &diff
+    set diffopt+=iwhite
+    set diffexpr=DiffW()
+    function DiffW()
+      let opt = ""
+       if &diffopt =~ "icase"
+         let opt = opt . "-i "
+       endif
+       if &diffopt =~ "iwhite"
+         let opt = opt . "-w " " swapped vim's -b with -w
+       endif
+       silent execute "!diff -a --binary " . opt .
+         \ v:fname_in . " " . v:fname_new .  " > " . v:fname_out
+    endfunction
+endif
+
 """"""" BABY PLUGINS
 function! EasyTerminal()
     if !exists('g:easy_terminal_canari')
@@ -241,7 +258,7 @@ let g:spell_checker_rotation = ['en_gb', 'fr', 'de']
 
 """"""""""""""""""""""""" COC CONFIG
 function! CocHandled()
-    let coc_filetypes = ['c', 'cpp', 'cc', 'cxx', 'h', 'hpp', 'rust', 'javascript', 'python']
+    let coc_filetypes = ['c', 'cpp', 'cc', 'cxx', 'h', 'hpp', 'rust', 'javascript', 'python', 'json']
     return index(coc_filetypes, &filetype) == - 1
 endfunction
 
@@ -256,12 +273,12 @@ nnoremap <silent> gt :call CocActionAsync('jumpDefinition', 'tab drop')<CR>
 nnoremap <silent> ge :CocList diagnostics<CR>
 nnoremap <silent> gs :CocList outline<CR>
 nnoremap <silent> gr :call CocActionAsync('jumpReferences')<CR>
-nnoremap <silent> gx :CocActionAsync('quickfix')<cr>
-nnoremap <silent> gf :CocFix<CR>
+nnoremap <silent> gx :CocFix<CR>
 nmap <silent> gh :call CocActionAsync('doHover')<CR>
 " how do I get this?
 "nnoremap <silent> gv :call CocActionAsync('preview')<CR>
 nnoremap <silent> <F2> :call CocActionAsync('rename')<CR>
+nnoremap <silent> <F1> :CocCommand clangd.switchSourceHeader<CR>
 
 " hihglight other instance of the varialbe we chill on
 autocmd CursorHold * silent call CocActionAsync('highlight')

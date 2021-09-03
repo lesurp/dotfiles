@@ -34,11 +34,11 @@ if [ "$TERM" = "xterm-kitty" ]
 then;
     alias ssh="kitty +kitten ssh"
 fi
+function mkcd() { mkdir -p $1 && cd $1 }
 export EDITOR='nvr -s --remote-wait-silent'
 export GIT_EDITOR='nvr -s --remote-wait-silent'
 export FZF_DEFAULT_COMMAND='rg --files --glob "!third_party/*"'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_DEFAULT_OPTS="--color=light"
-export CMAKE_EXPORT_COMPILE_COMMANDS=1
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 alias rcp="rsync -avhW --no-compress --progress"
