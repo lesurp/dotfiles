@@ -180,6 +180,7 @@ Plug 'lesurp/vim_spell_checker_rotation'
 
 Plug 'sakhnik/nvim-gdb', { 'do': ':!./install.sh \| UpdateRemotePlugins' }
 
+Plug 'lambdalisue/suda.vim'
 
 " snippets
 Plug 'SirVer/ultisnips'

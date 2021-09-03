@@ -10,6 +10,12 @@
             "initializationOptions": {
                 "buildDirectory": "build"
             }
+        },
+        "clangd": {
+            "command": "clangd",
+            "args": ["-background-index", "-j=4"],
+            "rootPatterns": ["compile_flags.txt", "compile_commands.json", ".vim/", ".git/", ".hg/"],
+            "filetypes": ["c", "cpp", "h", "hpp", "objc", "objcpp"]
         }
     },
     "diagnostic.errorSign" : "🍎",
