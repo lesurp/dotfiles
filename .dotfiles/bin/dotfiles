@@ -303,6 +303,9 @@ install_rustup() {
     local packages=$(sed 's/ /\n/g' <<< "${DOTFILES_CARGO_PACKAGES}")
     echo "$packages" | xargs -I{} $HOME/.cargo/bin/cargo install {}
 
+    local zsh_rg_completion=`find $HOME/.cargo/registry/src/ -name _rg | sort -r | head -n1`
+    cp $zsh_rg_completion $DOTFILES_ZSH_COMPLETIONS
+
     printf "Update/installation of rust toolchain/packages finished\n"
 
     append_config DOTFILES_CONFIG_RUSTUP_INSTALLED
