@@ -14,7 +14,7 @@
     renamelimit = 3000
 
 [mergetool]
-    keepBackup = false
+	keepBackup = false
 
 [mergetool "mergetool"]
     cmd = nvim -d $LOCAL $BASE $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'

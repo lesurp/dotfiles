@@ -1,4 +1,7 @@
 autoload -U compinit compaudit
+export TERM=xterm
+
+export DOTFILES_ZSH_HOME=/home/plesur/.dotfiles/install/zsh
 
 ZSH_CACHE_DIR="$DOTFILES_ZSH_HOME/cache"
 SHORT_HOST=${HOST/.*/}
