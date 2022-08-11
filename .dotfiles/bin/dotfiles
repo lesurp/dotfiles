@@ -239,6 +239,7 @@ install_repo() {
     git clone --bare $DOTFILES_UPSTREAM_REPO $DOTFILES_REPO
     config="git --git-dir=${DOTFILES_REPO} --work-tree=${HOME}"
     $config config status.showUntrackedFiles no
+    $config remote set-url origin git@github.com:lesurp/dotfiles.git
     branch_name=master
     ## FIXME: this doesn't actually work when piping through curl?
     ## i.e. it's always detected as being interactive which obv. fucks up everything
