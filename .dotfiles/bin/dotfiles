@@ -36,7 +36,7 @@ i3 dmenu network-manager network-manager-applet dunst feh
 
 fuse2 nodejs npm xclip pkg-config xorg-server
 
-noto-fonts-emoji ttf-fira-code
+noto-fonts-emoji ttf-fira-code fonts-noto-color-emoji fonts-firacode
 
 patch fakeroot
 
