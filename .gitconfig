@@ -39,3 +39,5 @@
 [user]
 	name = Paul Lesur
 	email = git@lesurpaul.fr
+[pull]
+	ff = only

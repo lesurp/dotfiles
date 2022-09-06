@@ -277,6 +277,7 @@ nnoremap <silent> ge :CocList diagnostics<CR>
 nnoremap <silent> gs :CocList outline<CR>
 nnoremap <silent> gr :call CocActionAsync('jumpReferences')<CR>
 nnoremap <silent> gx :CocFix<CR>
+nnoremap <silent> gz :CocAction<CR>
 nmap <silent> gh :call CocActionAsync('doHover')<CR>
 " how do I get this?
 "nnoremap <silent> gv :call CocActionAsync('preview')<CR>
@@ -309,3 +310,4 @@ hi default link LspCxxHlSymTypeParameter LspCxxHlGroupNamespace
 hi default LspCxxHlGroupMemberVariable ctermfg=95 guifg=Black
 
 autocmd BufRead,BufNewFile *.jl :set filetype=julia
+hi! CocErrorSign guifg=#c1868a guibg=#101010
