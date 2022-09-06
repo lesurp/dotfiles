@@ -31,8 +31,10 @@ set shortmess+=c
 set signcolumn=yes
 
 " don't fold when opening file, but make the manual one syntax based
-set foldlevel=99
-set foldmethod=syntax
+if &foldmethod == "manual"
+    set foldmethod=syntax
+    set foldlevel=99
+endif
 
 " change cwd to current netrw dir
 let g:netrw_keepdir = 0
@@ -291,6 +293,11 @@ inoremap <silent><expr> <c-s> pumvisible() ? coc#_select_confirm() :
 " run gg=G
 nmap <expr> <leader>ff CocHandled() ? "gg=G''" : ":call CocActionAsync('format')<CR>" 
 vmap <leader>ff <Plug>(coc-format-selected)
+
+hi! CocErrorSign guifg=#eeeeee
+hi! CocWarningSign guifg=#eeeeee
+hi! CocHintSign guifg=#eeeeee
+hi! CocInfoSign guifg=#eeeeee
 
 let g:lsp_cxx_hl_light_bg = 1
 hi default LspCxxHlGroupNamespace ctermfg=167 guifg=#BBBB00 cterm=none gui=none

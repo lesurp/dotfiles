@@ -30,13 +30,13 @@ save_conf() {
 # xclip for clipboard support
 # cppman is an offline cpp std lib documentation
 read -d '' DOTFILES_PACMAN_PACKAGES << EOF
-wget curl sudo zsh git which xorg-xinit python-pip patch fakeroot
+wget curl sudo zsh git which xorg-xinit python-pip pip patch fakeroot
 
-firefox i3 dmenu network-manager network-manager-applet dunst volumeicon pass
+firefox i3 dmenu network-manager network-manager-applet dunst feh volumeicon pass
 
 fuse2 nodejs npm xclip pkg-config xorg-server
 
-noto-fonts-emoji ttf-fira-code
+noto-fonts-emoji ttf-fira-code fonts-noto-color-emoji fonts-firacode
 
 clang clang++ cppman cmake make
 
@@ -142,7 +142,7 @@ find_update_cmd() {
 find_install_cmd() {
     case $1 in
         PACMAN) install_cmd="pacman -S --noconfirm"; return;;
-        DPKG)   install_cmd="apt-get install"; return;;
+        DPKG)   install_cmd="apt-get install -yq"; return;;
         YUM)    install_cmd="yum"; return;;
         ZYPPER) install_cmd="zypper"; return;;
     esac
@@ -240,6 +240,7 @@ install_repo() {
     git clone --bare $DOTFILES_UPSTREAM_REPO $DOTFILES_REPO
     config="git --git-dir=${DOTFILES_REPO} --work-tree=${HOME}"
     $config config status.showUntrackedFiles no
+    $config remote set-url origin git@github.com:lesurp/dotfiles.git
     branch_name=master
     ## FIXME: this doesn't actually work when piping through curl?
     ## i.e. it's always detected as being interactive which obv. fucks up everything
@@ -303,6 +304,9 @@ install_rustup() {
     $rustup completions zsh cargo > $DOTFILES_ZSH_COMPLETIONS/_cargo
     local packages=$(sed 's/ /\n/g' <<< "${DOTFILES_CARGO_PACKAGES}")
     echo "$packages" | xargs -I{} $HOME/.cargo/bin/cargo install {}
+
+    local zsh_rg_completion=`find $HOME/.cargo/registry/src/ -name _rg | sort -r | head -n1`
+    cp $zsh_rg_completion $DOTFILES_ZSH_COMPLETIONS
 
     printf "Update/installation of rust toolchain/packages finished\n"
 
