@@ -8,27 +8,16 @@ let g:python3_host_prog="/usr/bin/python3"
 set nomodeline
 " allow changing modified buffers
 set hidden
-
-set background=light
 set number
 set cursorline
-
-" tabzzzz
 set tabstop=4
 set shiftwidth=4
 set expandtab
-
 " more room for the messages (lol c++ templates)
 set cmdheight=2
-
-" gotta go fast
 set updatetime=0
-
-" !!?!?? let's see
-set shortmess+=c
-
-" always show signcolumns
-set signcolumn=yes
+set shortmess+=cI
+set signcolumn=number
 
 " don't fold when opening file, but make the manual one syntax based
 if &foldmethod == "manual"
@@ -54,10 +43,6 @@ set pastetoggle=<F9>
 
 " search n replace
 vnoremap <C-r> "hy:%s/<C-r>h//g<left><left>
-
-" omni complete w/ tab
-inoremap <expr> <tab> ((pumvisible())?("\<C-n>"):("<tab>"))
-inoremap <expr> <s-tab> ((pumvisible())?("\<C-p>"):("<s-tab>"))
 
 vnoremap <C-c> "+y
 vnoremap <C-x> "+d
@@ -116,7 +101,7 @@ noremap <M-6> 6gt
 noremap <M-7> 7gt
 noremap <M-8> 8gt
 noremap <M-9> 9gt
-noremap <M-0> :tabnew<CR>
+noremap <silent> <M-0> :tabnew<CR>
 
 " copy pasted mindlessly - ignore whitespaces when diff'ing files
 if &diff
@@ -138,75 +123,71 @@ endif
 """"""" BABY PLUGINS
 function! EasyTerminal()
     if !exists('g:easy_terminal_canari')
-        let g:easy_terminal_canari = 1
         tabnew
         tabmove
+        let g:easy_terminal_canari = win_getid()
         terminal
     endif
     tablast
 endfunction
-noremap <M-_> :call EasyTerminal()<CR>
+function! EasyTerminalReset(win_id)
+    if exists('g:easy_terminal_canari') && a:win_id == g:easy_terminal_canari
+        unlet g:easy_terminal_canari
+    endif
+endfunction
+autocmd WinClosed * call EasyTerminalReset(expand("<amatch>"))
+noremap <silent> <M-_> :call EasyTerminal()<CR>
 
 
 " line breaks after the next comma
 " (useful for breaking up long fn declarations)
 call setreg('l', "f,ls")
 
-" location list
-let g:location_list_open = 0
-function! LocationListToggle()
-    if g:location_list_open == 0
-        lopen
-        let g:location_list_open = 1
-    else
-        lclose
-        let g:location_list_open = 0
-    endif
-endfunction
 
 " replace the default "man" by cppman (for cpp source files only)
 autocmd FileType cpp set keywordprg=:term\ cppman
 
-nnoremap <leader>ll :CocDiagnostics<CR>
+
+" used to load coc only when required
+let g:coc_filetypes = ['c', 'cpp', 'cc', 'cxx', 'h', 'hpp', 'rust', 'javascript', 'python', 'json']
+function! CocHandled()
+    return index(g:coc_filetypes, &filetype) == - 1
+endfunction
+
 
 """"""""" PLUGINS
 call plug#begin()
-
-" random
-Plug 'vim-scripts/DoxygenToolkit.vim'
-Plug 'altercation/vim-colors-solarized'
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plug 'junegunn/fzf.vim'
-Plug 'lesurp/vim_spell_checker_rotation'
-"Plug 'lesurp/git-blame.vim'
-
-Plug 'sakhnik/nvim-gdb', { 'do': ':!./install.sh \| UpdateRemotePlugins' }
-
-
-" snippets
+"Plug 'miversen33/netman.nvim'
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
-
-" lsp
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'jackguo380/vim-lsp-cxx-highlight'
-
-Plug 'peterhoeg/vim-qml'
-Plug 'JuliaEditorSupport/julia-vim'
-
+Plug 'altercation/vim-colors-solarized'
+Plug 'jackguo380/vim-lsp-cxx-highlight', { 'for': ['cpp', 'c'] }
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
 Plug 'lambdalisue/suda.vim'
-
+Plug 'lervag/vimtex', { 'for': ['tex'] }
+Plug 'lesurp/vim_spell_checker_rotation'
+Plug 'neoclide/coc.nvim', {
+            \ 'branch': 'release', 'do': ':CocInstall coc-pyright coc-vimtex coc-json coc-rust-analyzer coc-snippets coc-clangd',
+            \ }
 call plug#end()
 
-""""""""""""""""""""""""" THEMING
+" The defaults for this don't interact nicely with coc
+" And for somer eason setting this normaly does NOT work because of stupid
+" colorscheme being called multiple times...
+function! FixHighlights() abort
+    highlight CocFloating ctermbg=7
+    highlight! DiagnosticHint ctermfg=2 ctermbg=0
+    highlight! DiagnosticVirtualTextHint ctermfg=2
+    highlight! DiagnosticFloatingHint ctermfg=2
+    " These work when called manually, not from here :(
+    sign define CocError texthl=LineNr   
+    sign define CocHint texthl=LineNr
+    sign define CocInfo texthl=LineNr
+    sign define CocWarning texthl=LineNr
+endfunction
+autocmd ColorScheme *  call FixHighlights()
 colorscheme solarized
-" NOTE: this stuff is for a light theme!
-hi StatusLine term=reverse ctermfg=248 ctermbg=7
-hi SignColumn term=reverse ctermfg=69 ctermbg=7
-au InsertEnter * hi StatusLine term=reverse ctermfg=2 ctermbg=7
-au InsertEnter * hi SignColumn term=reverse ctermfg=69 ctermbg=2
-au InsertLeave * hi StatusLine term=reverse ctermfg=248 ctermbg=7
-au InsertLeave * hi SignColumn term=reverse ctermfg=69 ctermbg=7
 
 """"""""""""""""""""""""" FZF CONFIG
 nnoremap <leader>t :FZF<CR>
@@ -231,80 +212,55 @@ let g:snips_github = "lesurp"
 nnoremap <silent> <leader>c :cnext<CR>
 nnoremap <silent> <leader>v :cprev<CR>
 
-""""""""""""""""""""""""" GIT BLAME CONFIG
-function! s:blame_if_no_term()
-    if &buftype ==# 'terminal'
-        return
-    endif
-
-    let l:fname = expand('%:p')
-    if strwidth(l:fname) == 0
-        return
-    endif
-
-    if l:fname =~ "/.git/"
-        return
-    endif
-
-    if l:fname[strlen(l:fname) - 1] == '/'
-        return
-    endif
-
-    call gitblame#echo()
-endfunction
-"autocmd CursorHold * call s:blame_if_no_term()
-
 """"""""""""""""""""""""" SPELLCHECKROTATE CONFIG
 nnoremap <leader>sp :<C-U>call SpellCheckRotate(v:count)<cr>
 let g:spell_checker_rotation = ['en_gb', 'fr', 'de']
 
 """"""""""""""""""""""""" COC CONFIG
-function! CocHandled()
-    let coc_filetypes = ['c', 'cpp', 'cc', 'cxx', 'h', 'hpp', 'rust', 'javascript', 'python', 'json']
-    return index(coc_filetypes, &filetype) == - 1
-endfunction
 
+" omni complete w/ tab
+function! s:check_back_space() abort
+    let col = col('.') - 1
+    return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+inoremap <silent><expr> <C-x><C-z> coc#pum#visible() ? coc#pum#stop() : "\<C-x>\<C-z>"
+inoremap <silent><expr> <TAB>
+      \ coc#pum#visible() ? coc#pum#next(1):
+      \ <SID>check_back_space() ? "\<Tab>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+inoremap <silent><expr> <c-space> coc#refresh()
 
 " Use `[g` and `]g` to navigate diagnostics
 nmap <silent> [g <Plug>(coc-diagnostic-prev)
 nmap <silent> ]g <Plug>(coc-diagnostic-next)
 
-nnoremap <silent> gc :CocList<CR>
+nnoremap <expr> <leader> gg :CocList<CR>
+nnoremap <silent> gc :CocCommand<CR>
 nnoremap <silent> gd :call CocActionAsync('jumpDefinition')<CR>
 nnoremap <silent> gt :call CocActionAsync('jumpDefinition', 'tab drop')<CR>
 nnoremap <silent> ge :CocList diagnostics<CR>
 nnoremap <silent> gs :CocList outline<CR>
 nnoremap <silent> gr :call CocActionAsync('jumpReferences')<CR>
-nnoremap <silent> gx :CocFix<CR>
+nnoremap <silent> gx :call CocActionAsync('doQuickfix')<CR>
 nmap <silent> gh :call CocActionAsync('doHover')<CR>
-" how do I get this?
-"nnoremap <silent> gv :call CocActionAsync('preview')<CR>
+nnoremap <silent> gv :call CocActionAsync('preview')<CR>
 nnoremap <silent> <F2> :call CocActionAsync('rename')<CR>
 nnoremap <silent> <F1> :CocCommand clangd.switchSourceHeader<CR>
+nmap <leader>a v<Plug>(coc-codeaction-selected)
 
-" hihglight other instance of the varialbe we chill on
-autocmd CursorHold * silent call CocActionAsync('highlight')
-
-inoremap <silent><expr> <c-s> pumvisible() ? coc#_select_confirm() : 
-            \"\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
-
-" if file sypported by CoC, run the global / selected formatting, otherwise
-" run gg=G
 nmap <expr> <leader>ff CocHandled() ? "gg=G''" : ":call CocActionAsync('format')<CR>" 
 vmap <leader>ff <Plug>(coc-format-selected)
 
-hi! CocErrorSign guifg=#eeeeee
-hi! CocWarningSign guifg=#eeeeee
-hi! CocHintSign guifg=#eeeeee
-hi! CocInfoSign guifg=#eeeeee
+inoremap <silent><expr> <cr>
+      \ coc#pum#visible() ? coc#_select_confirm() :
+      \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+      \ "\<cr>"
+      " not sure what this is for might be required?
+      "\ <SID>check_back_space() ? "\<cr>" :
+      "\ coc#refresh()
 
-let g:lsp_cxx_hl_light_bg = 1
-hi default LspCxxHlGroupNamespace ctermfg=167 guifg=#BBBB00 cterm=none gui=none
-hi default link LspCxxHlSymClass LspCxxHlGroupNamespace
-hi default link LspCxxHlSymStruct LspCxxHlGroupNamespace
-hi default link LspCxxHlSymEnum LspCxxHlGroupNamespace
-hi default link LspCxxHlSymTypeAlias LspCxxHlGroupNamespace
-hi default link LspCxxHlSymTypeParameter LspCxxHlGroupNamespace
-hi default LspCxxHlGroupMemberVariable ctermfg=95 guifg=Black
 
-autocmd BufRead,BufNewFile *.jl :set filetype=julia
+"""""""""""""""""" LaTex
+let g:vimtex_view_method = 'zathura'

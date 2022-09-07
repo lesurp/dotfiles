@@ -2,7 +2,9 @@
     "languageserver": {
         "cmake": {
             "command": "cmake-language-server",
-            "filetypes": ["cmake"],
+            "filetypes": [
+                "cmake"
+            ],
             "rootPatterns": [
                 "build/",
                 "CMakeLists.txt"
@@ -10,19 +12,44 @@
             "initializationOptions": {
                 "buildDirectory": "build"
             }
+        },
+        "haskell": {
+            "command": "haskell-language-server-wrapper",
+            "args": [
+                "--lsp"
+            ],
+            "rootPatterns": [
+                "*.cabal",
+                "stack.yaml",
+                "cabal.project",
+                "package.yaml",
+                "hie.yaml"
+            ],
+            "filetypes": [
+                "haskell",
+                "lhaskell"
+            ]
         }
     },
-    "diagnostic.errorSign" : "🍎",
-    "diagnostic.warningSign" : "🍌",
-    "diagnostic.infoSign" : "🥒",
-    "diagnostic.hintSign" : "💙",
-    "diagnostic.separateRelatedInformationAsDiagnostics" : true,
+    "diagnostic.errorSign": "🍎",
+    "diagnostic.warningSign": "🍌",
+    "diagnostic.infoSign": "🥒",
+    "diagnostic.hintSign": "🫐",
+    "diagnostic.separateRelatedInformationAsDiagnostics": true,
     "diagnostic.virtualText": true,
     "codeLens.enable": true,
     "rust-analyzer.checkOnSave.command": "clippy",
     "clangd.semanticHighlighting": true,
-    "clangd.arguments": ["-background-index", "-j=12"],
+    "clangd.arguments": [
+        "-background-index",
+        "-j=12"
+    ],
     "python.formatting.provider": "black",
     "suggest.enablePreselect": true,
-    "suggest.removeDuplicateItems": true
+    "suggest.removeDuplicateItems": true,
+    "coc.preferences.formatOnSaveFiletypes": [
+        "python",
+        "rs",
+        "rust"
+    ]
 }
