@@ -30,6 +30,7 @@ alias v=nvim
 alias g=git
 alias icat="kitty +kitten icat" # display image in terminal
 alias d="nvim -d" # diff files
+function mkcd() { mkdir -p $1; cd $1; }
 alias config='/usr/bin/git --git-dir=${DOTFILES_REPO} --work-tree=$HOME' # handle dotfiles
 if [ "$TERM" = "xterm-kitty" ]
 then;
@@ -43,3 +44,5 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_DEFAULT_OPTS="--color=light"
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 alias rcp="rsync -avhW --no-compress --progress"
+
+export BROWSER=firefox
