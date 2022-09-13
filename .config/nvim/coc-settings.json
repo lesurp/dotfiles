@@ -45,6 +45,7 @@
         "-j=12"
     ],
     "python.formatting.provider": "black",
+    "rust-analyzer.cargo.features": "all",
     "suggest.enablePreselect": true,
     "suggest.removeDuplicateItems": true,
     "coc.preferences.formatOnSaveFiletypes": [

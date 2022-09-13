@@ -12,15 +12,6 @@
 #   - is loaded *once* (i.e. need to logout to apply changes)
 #   - is loaded before starting i3, so setting the path there works
 
-
-# sets the function ctr_c as a callback when SIGINT (^C) is received
-trap ctrl_c INT
-ctrl_c() {
-    printf "SIGINT received - saving the conf then aborting!\n"
-    save_conf
-    exit 1
-}
-
 save_conf() {
     printf "$DOTFILES_CONFIG_OUT" > $DOTFILES_CONFIG_FILE
 }
@@ -36,7 +27,7 @@ firefox i3 dmenu network-manager network-manager-applet dunst feh volumeicon vol
 
 fuse2 nodejs npm xclip pkg-config xorg-server
 
-noto-fonts-emoji ttf-fira-code fonts-noto-color-emoji fonts-firacode fonts-noto fzf
+noto-fonts-emoji ttf-fira-code fonts-noto-color-emoji fonts-firacode fonts-noto
 
 clang clang++ cppman cmake make
 
@@ -66,6 +57,15 @@ else
     mkdir -p $DOTFILES_BINARY_DIR
     mkdir -p $DOTFILES_INSTALL_DIR
 fi
+
+# sets the function ctr_c as a callback when SIGINT (^C) is received
+trap ctrl_c INT
+ctrl_c() {
+    printf "SIGINT received - saving the conf then aborting!\n"
+    mv $DOTFILES_CONFIG_FILE $DOTFILES_CONFIG_FILE.bkp
+    save_conf
+    exit 1
+}
 
 
 # Each module should append its configuration to this variable

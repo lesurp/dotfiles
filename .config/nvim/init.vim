@@ -148,13 +148,6 @@ call setreg('l', "f,ls")
 autocmd FileType cpp set keywordprg=:term\ cppman
 
 
-" used to load coc only when required
-let g:coc_filetypes = ['c', 'cpp', 'cc', 'cxx', 'h', 'hpp', 'rust', 'javascript', 'python', 'json']
-function! CocHandled()
-    return index(g:coc_filetypes, &filetype) == - 1
-endfunction
-
-
 """"""""" PLUGINS
 call plug#begin()
 "Plug 'miversen33/netman.nvim'
@@ -177,9 +170,11 @@ call plug#end()
 " colorscheme being called multiple times...
 function! FixHighlights() abort
     highlight CocFloating ctermbg=7
-    highlight! DiagnosticHint ctermfg=2 ctermbg=0
-    highlight! DiagnosticVirtualTextHint ctermfg=2
-    highlight! DiagnosticFloatingHint ctermfg=2
+    highlight! CocHintFloat ctermfg=3
+    highlight! CocPumShortcut ctermfg=5
+    highlight! CocPumDetail ctermfg=2
+    highlight! CocPumSearch ctermfg=4
+
     " These work when called manually, not from here :(
     sign define CocError texthl=LineNr   
     sign define CocHint texthl=LineNr
@@ -250,7 +245,7 @@ nnoremap <silent> <F2> :call CocActionAsync('rename')<CR>
 nnoremap <silent> <F1> :CocCommand clangd.switchSourceHeader<CR>
 nmap <leader>a v<Plug>(coc-codeaction-selected)
 
-nmap <expr> <leader>ff CocHandled() ? "gg=G''" : ":call CocActionAsync('format')<CR>" 
+nmap <expr> <leader>ff CocHasProvider('format') ? ":call CocActionAsync('format')<CR>" : "gg=G''"
 vmap <leader>ff <Plug>(coc-format-selected)
 
 inoremap <silent><expr> <cr>
@@ -258,8 +253,8 @@ inoremap <silent><expr> <cr>
       \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
       \ "\<cr>"
       " not sure what this is for might be required?
-      "\ <SID>check_back_space() ? "\<cr>" :
-      "\ coc#refresh()
+      \ <SID>check_back_space() ? "\<cr>" :
+      \ coc#refresh()
 
 
 """""""""""""""""" LaTex
