@@ -39,7 +39,7 @@ fi
 function mkcd() { mkdir -p $1 && cd $1 }
 export EDITOR='nvr -s --remote-wait-silent'
 export GIT_EDITOR='nvr -s --remote-wait-silent'
-export FZF_DEFAULT_COMMAND='rg --files --glob "!third_party/*"'
+export FZF_DEFAULT_COMMAND='rg --files'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_DEFAULT_OPTS="--color=light"
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

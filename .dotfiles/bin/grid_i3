@@ -1,8 +1,10 @@
 #!/bin/bash
 
 i3-msg "append_layout $HOME/.config/i3/matrix4.json"
-sleep 0.01
-kitty -d="$1" &
-kitty -d="$1" &
-kitty -d="$1" &
-kitty -d="$1" &
+sleep 0.05
+nohup kitty -d="$1" &>/dev/null &
+nohup kitty -d="$1" &>/dev/null &
+nohup kitty -d="$1" &>/dev/null &
+nohup kitty -d="$1" &>/dev/null &
+disown
+kill -9 $PPID
