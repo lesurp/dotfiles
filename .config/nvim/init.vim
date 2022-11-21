@@ -158,7 +158,7 @@ Plug 'jackguo380/vim-lsp-cxx-highlight', { 'for': ['cpp', 'c'] }
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'lambdalisue/suda.vim'
-Plug 'lervag/vimtex', { 'for': ['tex'] }
+Plug 'lervag/vimtex'
 Plug 'lesurp/vim_spell_checker_rotation'
 Plug 'neoclide/coc.nvim', {
             \ 'branch': 'release', 'do': ':CocInstall coc-pyright coc-vimtex coc-json coc-rust-analyzer coc-snippets coc-clangd',
@@ -176,7 +176,7 @@ function! FixHighlights() abort
     highlight! CocPumSearch ctermfg=4
 
     " These work when called manually, not from here :(
-    sign define CocError texthl=LineNr   
+    sign define CocError texthl=LineNr
     sign define CocHint texthl=LineNr
     sign define CocInfo texthl=LineNr
     sign define CocWarning texthl=LineNr
@@ -231,7 +231,7 @@ inoremap <silent><expr> <c-space> coc#refresh()
 nmap <silent> [g <Plug>(coc-diagnostic-prev)
 nmap <silent> ]g <Plug>(coc-diagnostic-next)
 
-nnoremap <expr> <leader> gg :CocList<CR>
+nnoremap <silent> <leader> gg :CocList<CR>
 nnoremap <silent> gc :CocCommand<CR>
 nnoremap <silent> gd :call CocActionAsync('jumpDefinition')<CR>
 nnoremap <silent> gt :call CocActionAsync('jumpDefinition', 'tab drop')<CR>
