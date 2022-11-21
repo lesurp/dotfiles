@@ -164,6 +164,7 @@ exec --no-startup-id pactl load-module module-bluetooth-discover
 exec --no-startup-id xset dpms 600 600 600
 exec --no-startup-id xss-lock -- i3lock -n -t
 exec --no-startup-id feh --bg-fill --randomize ~/Wallpapers/*
+exec --no-startup-id flameshot
 
 exec --no-startup-id setxkbmap eu -option caps:swapescape
 # gotta sleep because xkbmap might still overide xmodmap (I think..?)
