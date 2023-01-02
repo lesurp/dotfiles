@@ -29,17 +29,20 @@ prompt_MEINE_THEME_precmd(){
   fi
   virtualenv_info="%{$fg[green]%}${virtualenv_info}%{$reset_color%}"
 
+  if [ -n "$SSH_CLIENT" ]
+  then
+    ssh_prompt="%{$fg[red]%}ssh%{$reset_color%} - "
+  fi
+
   local gitinfo=$(git_prompt_info)
-  local gitinfo_nocolor=$(echo "$gitinfo" | perl -pe "s/%\{[^}]+\}//g")
-  local exp_nocolor="$(print -P \"$base_prompt_nocolor$gitinfo_nocolor$post_prompt_nocolor\")"
+  local prompt_no_nl="$ssh_prompt$virtualenv_info$base_prompt$gitinfo"
+  local exp_nocolor="$(print -P \"$prompt_no_nl\")"
   local prompt_length=${#exp_nocolor}
 
-  local nl=""
-
-  if [[ $prompt_length -gt 40 ]]; then
+  if [[ $prompt_length -gt 60 ]]; then
     nl=$'\n%{\r%}';
   fi
-  PROMPT="$virtualenv_info$base_prompt$gitinfo$nl$post_prompt"
+  PROMPT="$prompt_no_nl$nl$post_prompt"
 }
 
 prompt_setup_MEINE_THEME
