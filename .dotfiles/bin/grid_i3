@@ -7,4 +7,5 @@ nohup kitty -d="$1" &>/dev/null &
 nohup kitty -d="$1" &>/dev/null &
 nohup kitty -d="$1" &>/dev/null &
 disown
+sleep 0.05
 kill -9 $PPID
