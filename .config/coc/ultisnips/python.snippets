@@ -23,3 +23,38 @@
 #		endsnippet
 #
 # Online reference: https://github.com/SirVer/ultisnips/blob/master/doc/UltiSnips.txt
+
+snippet helloworld "Initialize a basic python script because we're lazy"
+#!/usr/bin/env python3
+import argparse
+import logging
+import time
+from logging import warn
+
+def parse_args():
+    p = argparse.ArgumentParser()
+    p.add_argument("-v", action="count")
+    return p.parse_args()
+
+
+def init_logging(verbosity_flag):
+    levels = {0: logging.WARN, 1: logging.INFO, 2: logging.DEBUG}
+    verbosity_flag = min(verbosity_flag, next(reversed(levels.keys())))
+    level = levels[verbosity_flag]
+    if level is None:
+        warn(
+            f"Invalid value ({verbosity_flag}) passed when initializing logging. Ignoring and defaulting to warning"
+        )
+        level = logging.WARN
+    logging.basicConfig(level=level,format='%(asctime)s %(levelname)s - %(message)s')
+	logging.Formatter.converter = time.gmtime
+
+def main():
+    args = parse_args()
+	init_logging(args.verbosity)
+
+
+
+if __name__ == "__main__":
+    main()
+endsnippet
