@@ -1,18 +1,5 @@
 {
     "languageserver": {
-        "cmake": {
-            "command": "cmake-language-server",
-            "filetypes": [
-                "cmake"
-            ],
-            "rootPatterns": [
-                "build/",
-                "CMakeLists.txt"
-            ],
-            "initializationOptions": {
-                "buildDirectory": "build"
-            }
-        },
         "haskell": {
             "command": "haskell-language-server-wrapper",
             "args": [
