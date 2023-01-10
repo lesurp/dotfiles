@@ -47,11 +47,11 @@ def init_logging(verbosity_flag):
         )
         level = logging.WARN
     logging.basicConfig(level=level,format='%(asctime)s %(levelname)s - %(message)s')
-	logging.Formatter.converter = time.gmtime
+    logging.Formatter.converter = time.gmtime
 
 def main():
     args = parse_args()
-	init_logging(args.verbosity)
+    init_logging(args.verbosity)
 
 
 
