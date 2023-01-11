@@ -31,13 +31,13 @@ import logging
 import time
 from logging import warn
 
-def parse_args():
+def _parse_args():
     p = argparse.ArgumentParser()
-    p.add_argument("-v", action="count")
+    p.add_argument("--verbose", "-v", action="count", default=0)
     return p.parse_args()
 
 
-def init_logging(verbosity_flag):
+def _init_logging(verbosity_flag):
     levels = {0: logging.WARN, 1: logging.INFO, 2: logging.DEBUG}
     verbosity_flag = min(verbosity_flag, next(reversed(levels.keys())))
     level = levels[verbosity_flag]
@@ -46,13 +46,14 @@ def init_logging(verbosity_flag):
             f"Invalid value ({verbosity_flag}) passed when initializing logging. Ignoring and defaulting to warning"
         )
         level = logging.WARN
-    logging.basicConfig(level=level,format='%(asctime)s %(levelname)s - %(message)s')
+    logging.basicConfig(level=level,format="%(asctime)s %(levelname)s - %(message)s")
     logging.Formatter.converter = time.gmtime
 
-def main():
-    args = parse_args()
-    init_logging(args.verbosity)
 
+def main():
+    args = _parse_args()
+    _init_logging(args.verbose)
+    info(f"Arguments: {vars(args)}")
 
 
 if __name__ == "__main__":
