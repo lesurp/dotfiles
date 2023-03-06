@@ -29,7 +29,8 @@ snippet helloworld "Initialize a basic python script because we're lazy"
 import argparse
 import logging
 import time
-from logging import warn
+from logging import info, warn
+
 
 def _parse_args():
     p = argparse.ArgumentParser()
@@ -46,7 +47,7 @@ def _init_logging(verbosity_flag):
             f"Invalid value ({verbosity_flag}) passed when initializing logging. Ignoring and defaulting to warning"
         )
         level = logging.WARN
-    logging.basicConfig(level=level,format="%(asctime)s %(levelname)s - %(message)s")
+    logging.basicConfig(level=level, format="%(asctime)s %(levelname)s - %(message)s")
     logging.Formatter.converter = time.gmtime
 
 
