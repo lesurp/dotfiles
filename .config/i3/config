@@ -170,7 +170,6 @@ exec --no-startup-id setxkbmap eu -option caps:swapescape
 # gotta sleep because xkbmap might still overide xmodmap (I think..?)
 exec --no-startup-id sleep 3; xmodmap $HOME/.keybored
 
-exec --no-startup-id mattermost-desktop
 ############################
 
 ### LAPTOP MEDIA BUTTONS
