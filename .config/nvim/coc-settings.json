@@ -25,6 +25,7 @@
     "diagnostic.separateRelatedInformationAsDiagnostics": true,
     "diagnostic.virtualText": true,
     "codeLens.enable": true,
+    "codeLens.position": "eol",
     "rust-analyzer.checkOnSave.command": "clippy",
     "semanticTokens.enable": true,
     "clangd.arguments": [
@@ -38,5 +39,6 @@
     "rust-analyzer.cargo.features": "all",
     "suggest.enablePreselect": true,
     "suggest.removeDuplicateItems": true,
-    "coc.preferences.formatOnSave": true
+    "coc.preferences.formatOnSave": true,
+    "snippets.ultisnips.pythonPrompt": false
 }

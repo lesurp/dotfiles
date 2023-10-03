@@ -16,7 +16,7 @@ save_conf() {
     printf "$DOTFILES_CONFIG_OUT" > $DOTFILES_CONFIG_FILE
 }
 
-# fuse2 is erquired to run nvim from the AppImage
+# fuse2 is required to run nvim from the AppImage
 # node / npm are for the cocnvim runtime
 # xclip for clipboard support
 # cppman is an offline cpp std lib documentation
@@ -27,12 +27,12 @@ which patch fakeroot fuse2 xclip pkg-config
 
 i3 dmenu dunst feh network-manager
 network-manager-applet volumeicon volumeicon-alsa pavucontrol flameshot
-firefox pass
+firefox pass zathura
 
 noto-fonts-emoji ttf-fira-code fonts-noto-color-emoji fonts-firacode fonts-noto
 
 nodejs npm
-python-pip pip
+python-pip pip python-pynvim
 clang clang++ cppman cmake make
 texlive-bibtexextra texlive-frontsextra biber
 EOF

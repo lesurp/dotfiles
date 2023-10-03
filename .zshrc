@@ -37,8 +37,8 @@ then;
     alias ssh="kitty +kitten ssh"
 fi
 function mkcd() { mkdir -p $1 && cd $1 }
-export EDITOR='nvr -s --remote-wait-silent'
-export GIT_EDITOR='nvr -s --remote-wait-silent'
+export EDITOR=nvim
+export GIT_EDITOR=nvim
 export FZF_DEFAULT_COMMAND='rg --files'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_DEFAULT_OPTS="--color=light"
@@ -46,3 +46,5 @@ export FZF_DEFAULT_OPTS="--color=light"
 alias rcp="rsync -avhW --no-compress --progress"
 
 export BROWSER=firefox
+
+[ -f "/home/lesurp/.ghcup/env" ] && source "/home/lesurp/.ghcup/env" # ghcup-env

@@ -13,7 +13,11 @@ PATH="$HOME/.bin:$PATH"
 PATH="$HOME/.cargo/bin:$PATH"
 PATH="$HOME/.local/bin:$PATH"
 PATH="$PYENV_ROOT/bin:$PATH"
+
+[ -f "$HOME/.dotfilesextra" ] && source "$HOME/.dotfilesextra"
+
 export PATH
+cat $HOME/.config/i3/*.config > $HOME/.config/i3/config
 
 if systemctl -q is-active graphical.target && [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]]; then
   exec startx
