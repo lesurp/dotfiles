@@ -1,26 +1,5 @@
-[core]
-    excludesfile = ~/.gitexclude
-[push]
-    default = simple
-
-[diff]
-    tool = diffmerge
-
-[difftool "diffmerge"]
-    cmd = "nvim -d $LOCAL $REMOTE"
-
-[merge]
-    tool = mergetool
-    renamelimit = 3000
-
-[mergetool]
-	keepBackup = false
-
-[mergetool "mergetool"]
-    cmd = nvim -d $LOCAL $BASE $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'
-
 [alias]
-    rb = rebase -i --autosquash
+    rb = rebase -i
     d = difftool
     s = status
     c = commit
@@ -30,14 +9,61 @@
     lg-light-bg = log --graph --abbrev-commit --decorate --format=format:'%C(bold green)%h%C(reset) - %C(bold cyan)(%ar)%C(reset) %C(black)%s%C(reset) %C(dim black)- %an%C(reset)%C(auto)%d%C(reset)'
     lg-dark-bg = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)'
 
+[branch]
+    sort = committerdate
+
+[core]
+    excludesfile = ~/.gitexclude
+
+[credential]
+    helper = store
+
+[diff]
+    tool = diffmerge
+    algorithm = histogram
+
+[difftool "diffmerge"]
+    cmd = "nvim -d $LOCAL $REMOTE"
+
+[fetch]
+    prune = true
+
 [filter "lfs"]
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
 	clean = git-lfs clean -- %f
 
-[user]
-	name = Paul Lesur
-	email = git@lesurpaul.fr
+[help]
+    autocorrect = immediate
+
+[log]
+    date = iso
+
 [pull]
 	ff = only
+
+[push]
+    default = current
+    followtags = true
+
+[merge]
+    tool = mergetool
+    renamelimit = 3000
+    conflictstyle = zdiff3
+    keepBackup = false
+
+[mergetool]
+	keepBackup = false
+
+[mergetool "mergetool"]
+    cmd = nvim -d $LOCAL $BASE $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'
+
+[rebase]
+    autostash = true
+    autosquash = true
+    missingCommitsCheck = error
+    updateRefs = true
+
+[include]
+    path = "~/.dotfiles/gitconfig"

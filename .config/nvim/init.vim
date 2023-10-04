@@ -4,6 +4,8 @@
 " makes startup time MUCH FASTER
 let g:python3_host_prog="/usr/bin/python3"
 
+set background=light
+
 " disable auto executed vimscript (fucking RCE waiting to happen)
 set nomodeline
 " allow changing modified buffers
@@ -40,6 +42,8 @@ nnoremap n nzz
 nnoremap N Nzz
 nnoremap ; :
 set pastetoggle=<F9>
+
+command E Explore
 
 " search n replace
 vnoremap <C-r> "hy:%s/<C-r>h//g<left><left>
@@ -153,8 +157,7 @@ call plug#begin()
 "Plug 'miversen33/netman.nvim'
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
-Plug 'altercation/vim-colors-solarized'
-Plug 'jackguo380/vim-lsp-cxx-highlight', { 'for': ['cpp', 'c'] }
+Plug 'shaunsingh/solarized.nvim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'lambdalisue/suda.vim'
@@ -163,25 +166,11 @@ Plug 'lesurp/vim_spell_checker_rotation'
 Plug 'neoclide/coc.nvim', {
             \ 'branch': 'release', 'do': ':CocInstall coc-pyright coc-vimtex coc-json coc-rust-analyzer coc-snippets coc-clangd',
             \ }
+Plug 'mfussenegger/nvim-dap'
 call plug#end()
 
-" The defaults for this don't interact nicely with coc
-" And for somer eason setting this normaly does NOT work because of stupid
-" colorscheme being called multiple times...
-function! FixHighlights() abort
-    highlight CocFloating ctermbg=7
-    highlight! CocHintFloat ctermfg=3
-    highlight! CocPumShortcut ctermfg=5
-    highlight! CocPumDetail ctermfg=2
-    highlight! CocPumSearch ctermfg=4
-
-    " These work when called manually, not from here :(
-    sign define CocError texthl=LineNr
-    sign define CocHint texthl=LineNr
-    sign define CocInfo texthl=LineNr
-    sign define CocWarning texthl=LineNr
-endfunction
-autocmd ColorScheme *  call FixHighlights()
+let g:solarized_disable_background = v:true
+let g:solarized_contrast = v:false
 colorscheme solarized
 
 """"""""""""""""""""""""" FZF CONFIG
@@ -189,13 +178,6 @@ nnoremap <leader>t :FZF<CR>
 let g:fzf_buffers_jump = 1
 let g:fzf_command_prefix = 'Fzf'
 nnoremap <leader>b :FzfBuffers<CR>
-function! s:fzf_statusline()
-    highlight fzf1 ctermfg=161 ctermbg=248
-    highlight fzf2 ctermfg=23 ctermbg=248
-    highlight fzf3 ctermfg=237 ctermbg=248
-    setlocal statusline=%#fzf1#\ >\ %#fzf2#fz%#fzf3#f
-endfunction
-autocmd! User FzfStatusLine call <SID>fzf_statusline()
 
 """"""""""""""""""""""""" ULTISNIP CONFIG
 " we use the shortcut from coc, so we simply disable
@@ -231,7 +213,7 @@ inoremap <silent><expr> <c-space> coc#refresh()
 nmap <silent> [g <Plug>(coc-diagnostic-prev)
 nmap <silent> ]g <Plug>(coc-diagnostic-next)
 
-nnoremap <silent> <leader> gg :CocList<CR>
+nnoremap <silent> gl :CocList<CR>
 nnoremap <silent> gc :CocCommand<CR>
 nnoremap <silent> gd :call CocActionAsync('jumpDefinition')<CR>
 nnoremap <silent> gt :call CocActionAsync('jumpDefinition', 'tab drop')<CR>
@@ -245,8 +227,8 @@ nnoremap <silent> <F2> :call CocActionAsync('rename')<CR>
 nnoremap <silent> <F1> :CocCommand clangd.switchSourceHeader<CR>
 nmap <leader>a v<Plug>(coc-codeaction-selected)
 
-nmap <expr> <leader>ff CocHasProvider('format') ? ":call CocActionAsync('format')<CR>" : "gg=G''"
-vmap <leader>ff <Plug>(coc-format-selected)
+nmap <expr> <leader>f CocHasProvider('format') ? ":call CocActionAsync('format')<CR>" : "gg=G''"
+vmap <leader>f <Plug>(coc-format-selected)
 
 inoremap <silent><expr> <cr>
       \ coc#pum#visible() ? coc#_select_confirm() :
@@ -259,3 +241,60 @@ inoremap <silent><expr> <cr>
 
 """""""""""""""""" LaTex
 let g:vimtex_view_method = 'zathura'
+
+
+lua <<LUA
+local dap = require('dap')
+dap.adapters.lldb = {
+  type = 'executable',
+  command = '/usr/bin/lldb-vscode-15', -- adjust as needed, must be absolute path
+  name = 'lldb'
+}
+dap.adapters.cpp = dap.adapters.lldb
+dap.configurations.cpp = {
+  {
+    name = 'Launch',
+    type = 'lldb',
+    request = 'launch',
+    program = function()
+      return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+    end,
+    cwd = '${workspaceFolder}',
+    stopOnEntry = false,
+    args = {},
+  },
+}
+
+dap.configurations.c = dap.configurations.cpp
+dap.configurations.rust = dap.configurations.cpp
+
+vim.keymap.set('n', '<F5>', function()
+    if vim.fn.filereadable('.vscode/launch.json') then
+      require('dap.ext.vscode').load_launchjs()
+    end
+    dap.continue()
+end)
+vim.keymap.set('n', '<F10>', dap.step_over)
+vim.keymap.set('n', '<F11>', dap.step_into)
+vim.keymap.set('n', '<F12>', dap.step_out)
+vim.keymap.set('n', '<leader>db', dap.toggle_breakpoint)
+vim.keymap.set('n', '<leader>dB', dap.set_breakpoint)
+vim.keymap.set('n', '<leader>dm', function() dap.set_breakpoint(nil, nil, vim.fn.input('Log point message: ')) end)
+vim.keymap.set('n', '<leader>dr', dap.repl.open)
+vim.keymap.set('n', '<leader>dl', dap.run_last)
+vim.keymap.set({'n', 'v'}, '<leader>h', function()
+  require('dap.ui.widgets').hover()
+end)
+vim.keymap.set({'n', 'v'}, '<leader>dp', function()
+  require('dap.ui.widgets').preview()
+end)
+vim.keymap.set('n', '<leader>df', function()
+  local widgets = require('dap.ui.widgets')
+  widgets.centered_float(widgets.frames)
+end)
+vim.keymap.set('n', '<leader>ds', function()
+  local widgets = require('dap.ui.widgets')
+  widgets.centered_float(widgets.scopes)
+end)
+
+LUA
