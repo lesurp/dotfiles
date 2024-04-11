@@ -60,6 +60,9 @@ nnoremap <silent> <C-Left> :vertical resize -5<CR>
 nnoremap <silent> <C-Up> :resize +5<CR>
 nnoremap <silent> <C-Down> :resize -5<CR>
 
+" jump to next git merge separator
+nnoremap <silent> <c-n> :let @/ = "\\\(\^<<<<<<<\\\|\^\|\|\|\|\|\|\|\\\|\^=======\\\|\^>>>>>>>\\\)"<cr>:normal n<cr>
+
 
 " spellczeck
 autocmd BufNewFile,BufRead *.tex set spell textwidth=80
