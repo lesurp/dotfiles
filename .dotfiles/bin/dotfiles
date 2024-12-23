@@ -26,7 +26,7 @@ wget curl sudo zsh git
 which patch fakeroot fuse2 xclip pkg-config libfuse2
 
 i3 dmenu dunst feh network-manager
-network-manager-applet volumeicon volumeicon-alsa pavucontrol flameshot
+network-manager-applet pasystray pavucontrol flameshot
 firefox pass zathura
 
 noto-fonts-emoji ttf-fira-code fonts-noto-color-emoji fonts-firacode fonts-noto
