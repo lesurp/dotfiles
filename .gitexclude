@@ -4,3 +4,4 @@
 *.pyc
 compile_commands.json
 .python-version
+.idea

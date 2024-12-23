@@ -36,6 +36,7 @@
     ],
     "python.formatting.provider": "black",
     "rust-analyzer.cargo.features": "all",
+    "rust-analyzer.check.command": "clippy",
     "suggest.enablePreselect": true,
     "suggest.removeDuplicateItems": true,
     "coc.preferences.formatOnSave": false,
