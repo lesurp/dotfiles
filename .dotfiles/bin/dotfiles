@@ -22,17 +22,15 @@ save_conf() {
 # cppman is an offline cpp std lib documentation
 read -d '' DOTFILES_PACMAN_PACKAGES << EOF
 xorg-xinit xorg-server
-wget curl sudo zsh git
-which patch fakeroot fuse2 xclip pkg-config libfuse2
+wget curl sudo git
+which patch fakeroot xclip pkg-config
 
 i3 dmenu dunst feh network-manager
-network-manager-applet pasystray pavucontrol flameshot
+network-manager-applet pasystray flameshot
 firefox pass zathura
 
 noto-fonts-emoji ttf-fira-code fonts-noto-color-emoji fonts-firacode fonts-noto
 
-nodejs npm
-python-pip pip python-pynvim
 clang clang++ cppman cmake make
 texlive-bibtexextra texlive-frontsextra biber
 EOF
@@ -42,6 +40,10 @@ read -d '' DOTFILES_CARGO_PACKAGES << EOF
 ripgrep
 cargo-edit
 fd-find
+nu
+ripdrag
+zoxide
+--git https://github.com/helix-editor/helix
 EOF
 
 
@@ -305,7 +307,7 @@ install_rustup() {
     $rustup completions zsh > $DOTFILES_ZSH_COMPLETIONS/_rustup
     $rustup completions zsh cargo > $DOTFILES_ZSH_COMPLETIONS/_cargo
     local packages=$(sed 's/ /\n/g' <<< "${DOTFILES_CARGO_PACKAGES}")
-    echo "$packages" | xargs -I{} $HOME/.cargo/bin/cargo install {}
+    echo "$packages" | xargs -I{} $HOME/.cargo/bin/cargo install {} --locked
 
     local zsh_rg_completion=`find $HOME/.cargo/registry/src/ -name _rg | sort -r | head -n1`
     cp $zsh_rg_completion $DOTFILES_ZSH_COMPLETIONS
@@ -315,7 +317,22 @@ install_rustup() {
     append_config DOTFILES_CONFIG_RUSTUP_INSTALLED
 }
 
-installers="system zsh repo nvim kitty rustup"
+DOTFILES_CONFIG_NUSCRIPTS_DIR=$HOME/.nu_scripts
+install_nuscripts() {
+    if [ "$DOTFILES_CONFIG_NUSHELL_INSTALLED" == $TRUE ]; then
+        printf "Updating nushell scripts...\n"
+        cd $DOTFILES_CONFIG_NUSCRIPTS_DIR
+        git pull
+    else
+        printf "Installing nushell scipts...\n"
+        git clone https://github.com/nushell/nu_scripts $DOTFILES_CONFIG_NUSCRIPTS_DIR
+        DOTFILES_CONFIG_NUSHELL_INSTALLED=$TRUE
+    fi
+    
+    append_config DOTFILES_CONFIG_NUSCRIPTS_INSTALLED
+}
+
+installers="system repo kitty rustup nuscripts"
 if [[ $# -eq 0 ]]; then
     to_be_installed=$installers
 else

@@ -1,0 +1,12 @@
+[language-server.texlab.config.texlab.build]
+onSave = true
+
+[[language]]
+name = "rust"
+auto-format = true
+
+[language-server.rust-analyzer.config.cargo]
+features = "all"
+
+[language-server.rust-analyzer.config.check]
+command = "clippy"
