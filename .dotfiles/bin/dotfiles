@@ -3,8 +3,7 @@
 # curl -s https://raw.githubusercontent.com/lesurp/dotfiles/master/.dotfiles/bin/dotfiles | bash
 
 save_conf() {
-    printf "$DOTFILES_CONFIG_OUT_BASH" > $DOTFILES_CONFIG_FILE_BASH
-    printf "$DOTFILES_CONFIG_OUT_NU" > $DOTFILES_CONFIG_FILE_NU
+    printf "$DOTFILES_CONFIG_OUT" > $DOTFILES_CONFIG_FILE
 }
 
 read -d '' DOTFILES_PACMAN_PACKAGES << EOF
@@ -40,10 +39,9 @@ DOTFILES_HOME=$HOME/.dotfiles
 DOTFILES_REPO=$DOTFILES_HOME/repo
 DOTFILES_BINARY_DIR=$DOTFILES_HOME/bin
 DOTFILES_INSTALL_DIR=$DOTFILES_HOME/install
-DOTFILES_CONFIG_FILE_BASH=$DOTFILES_HOME/config.bash
-DOTFILES_CONFIG_FILE_NU=$DOTFILES_HOME/config.nu
-if [ -f $DOTFILES_CONFIG_FILE_BASH ]; then
-    source $DOTFILES_CONFIG_FILE_BASH
+DOTFILES_CONFIG_FILE=$DOTFILES_HOME/config.bash
+if [ -f $DOTFILES_CONFIG_FILE ]; then
+    source $DOTFILES_CONFIG_FILE
 else
     # if the config file does not exist, assume first run (and create dirs etc.)
     mkdir -p $DOTFILES_BINARY_DIR
@@ -54,8 +52,7 @@ fi
 trap ctrl_c INT
 ctrl_c() {
     printf "SIGINT received - saving the conf then aborting!\n"
-    mv $DOTFILES_CONFIG_FILE_BASH $DOTFILES_CONFIG_FILE_BASH.bkp
-    mv $DOTFILES_CONFIG_FILE_NU $DOTFILES_CONFIG_FILE_NU.bkp
+    mv $DOTFILES_CONFIG_FILE $DOTFILES_CONFIG_FILE.bkp
     save_conf
     exit 1
 }
@@ -63,11 +60,9 @@ ctrl_c() {
 
 # Each module should append its configuration to this variable
 # We stores its value to the above file
-DOTFILES_CONFIG_OUT_BASH=""
-DOTFILES_CONFIG_OUT_NU=""
+DOTFILES_CONFIG_OUT=""
 append_config() {
-    DOTFILES_CONFIG_OUT_NU+="\$env.$1 = \"${!1}\"\n"
-    DOTFILES_CONFIG_OUT_BASH+="export $1=${!1}\n"
+    DOTFILES_CONFIG_OUT+="export $1=${!1}\n"
     save_conf
 }
 
@@ -170,7 +165,7 @@ install_system() {
 
 install_helix() {
     DOTFILES_HELIX_DIR=$DOTFILES_INSTALL_DIR/helix
-    git clone https://github.com/helix-editor/helix/ $DOTFILES_HELIX_DIR
+    [ ! -d $DOTFILES_HELIX_DIR ] && git clone https://github.com/helix-editor/helix/ $DOTFILES_HELIX_DIR
 
     cd $DOTFILES_HELIX_DIR
     git pull
@@ -200,21 +195,6 @@ install_repo() {
     $config config status.showUntrackedFiles no
     $config remote set-url origin git@github.com:lesurp/dotfiles.git
     branch_name=master
-    ## FIXME: this doesn't actually work when piping through curl?
-    ## i.e. it's always detected as being interactive which obv. fucks up everything
-    # if this is an interactive shell, prompt the user for a new branch name for this config
-    #if [ -t 1 ]; then
-    #    echo "The existing configurations are:"
-    #    $config branch -a | tail -n +2 | cut -d"/" -f2
-    #    printf "Enter a desired configuration branch.\n"
-    #    read -p "If it doesn't exist, it will be created based on master. " branch_name
-    #    if [ -z "${branch_name}" ]; then
-    #        branch_name=master
-    #    fi
-    #else
-    #    branch_name=master
-    #fi
-    # Note that this does not delete uncommitted changes!
     $config checkout -B ${branch_name}
 
     printf "Set dotfiles' configuration branch to ${branch_name}\n"
@@ -225,7 +205,7 @@ install_repo() {
 
 install_nu_scripts() {
     DOTFILES_NU_SCRIPTS_DIR=$DOTFILES_INSTALL_DIR/nu_scripts
-    git clone https://github.com/nushell/nu_scripts $DOTFILES_NU_SCRIPTS_DIR
+    [ ! -d $DOTFILES_NU_SCRIPTS_DIR ] && git clone https://github.com/nushell/nu_scripts $DOTFILES_NU_SCRIPTS_DIR
     cd $DOTFILES_NU_SCRIPTS_DIR
     git pull
     append_config DOTFILES_NU_SCRIPTS_DIR
