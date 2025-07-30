@@ -1,16 +1,33 @@
-# config.nu
-#
-# Installed by:
-# version = "0.104.0"
+use std/config light-theme
 
-const nuscripts = "~/.nu_scripts"
-const compl = $"($nuscripts)/custom-completions"
-source $"($compl)/git/git-completions.nu"
-source $"($compl)/cargo/cargo-completions.nu"
-source $"($compl)/rg/rg-completions.nu"
-source $"($compl)/zoxide/zoxide-completions.nu"
-source $"($compl)/zoxide/zoxide-completions.nu"
-use $"($nuscripts)/modules/prompt/panache-git.nu" main
+$env.config = {
+    color_config: (light-theme)
+    show_banner: false # true or false to enable or disable the welcome banner at startup
+    keybindings: [
+        {
+            name: take_history_hint
+            modifier: shift
+            keycode: enter
+            mode: [emacs, vi_normal, vi_insert]
+            event: { 
+                until: [
+                    { send: historyhintcomplete }
+                    { send: enter }
+                ]
+            }
+        }
+        {
+            name: fuzzy_file
+            modifier: control
+            keycode: char_t
+            mode: [emacs, vi_normal, vi_insert]
+            event: {
+                send: executehostcommand
+                cmd: "commandline edit --insert (fzf --color=light)"
+        }
+        }
+    ]
+}
 
 open .dotfiles/config
   | split row "\n"
@@ -19,38 +36,67 @@ open .dotfiles/config
   | reduce -f {} {|it, acc| $acc | upsert $it.column1 $it.column2 }
   | load-env
 
-use std/config light-theme
+def --wrapped dotconf [...args: string] {
+    /usr/bin/git --git-dir=($env.DOTFILES_REPO) --work-tree=($env.HOME) ...$args
+}
+alias g = git
+alias h = hx
 
-$env.PROMPT_COMMAND = {|| panache-git }
-$env.PROMPT_INDICATOR = {|| $"(ansi reset)> "}
-$env.PROMPT_INDICATOR_VI_INSERT = {|| $"(ansi reset): " }
-$env.PROMPT_INDICATOR_VI_NORMAL = {|| $"(ansi reset)> " }
+const git_compl_path = "~/.dotfiles/install/nu_scripts/custom-completions/git/git-completions.nu"
+source (if ($git_compl_path | path exists) { $git_compl_path } else { null })
 
-$env.config = {
-  color_config: (light-theme)   # if you want a light theme, replace `$dark_theme` to `$light_theme`
-  show_banner: false
-  use_kitty_protocol: true
-  keybindings: [
-    {
-      name: fzf
-      modifier: control
-      keycode: Char_t
-      mode: emacs
-      event: {
-        send: executehostcommand,
-        cmd: "commandline edit --insert (fzf)"
-      }
+const panache_git_path = "~/.dotfiles/install/nu_scripts/modules/prompt/panache-git.nu"
+use (if ($panache_git_path | path exists) { $panache_git_path} else { null }) main
+
+$env.CMAKE_EXPORT_COMPILE_COMMANDS = 1
+$env.CMAKE_GENERATOR = "Ninja"
+
+def git-lazycommit [] {
+    for $it in (git ls-files --modified | split row "\n") {
+        let last_hash = git log -n 1 --pretty=format:%H $it
+        git add $it
+        git commit --fixup=$last_hash
     }
-    {
-      name: autocomplete
-      modifier: shift
-      keycode: enter
-      mode: [ emacs, vi_insert, vi_normal ]
-      event: { until: [{send: historyhintcomplete } {send: enter}] }
-    }
-  ]
 }
 
-alias h = hx
-alias g = git
-alias dotconf = git --git-dir=($env.DOTFILES_REPO) --work-tree=($env.HOME)
+alias splitr = split row "\n"
+
+def --env mkcd [dir: string] {
+    mkdir $dir
+    cd $dir
+}
+
+module rplace_module {
+    def curdir [context: string] {
+        ls --short-names | get name
+    }
+
+    export def rplace [find: string, replace: string, file_or_dir?: string@curdir] {
+        let file_or_dir = match $file_or_dir {
+          null => { "./" }
+          _ => { $file_or_dir }
+        };
+    
+        let files = match ($file_or_dir | path type) {
+            dir => { rg --files-with-matches $find $file_or_dir | splitr }
+            file => { [$file_or_dir] }
+        }
+
+        $files
+            | each {|fname|
+                open --raw $fname
+                    | str replace --all --regex $find $replace
+                    | save $fname -f; $fname
+                }
+    }
+}
+
+def hell [pattern: string] {
+    hx ...(rg --files-with-matches $pattern | splitr)
+}
+
+def hellf [pattern: string] {
+    hx ...(glob --no-dir **/$pattern)
+}
+
+use rplace_module rplace;

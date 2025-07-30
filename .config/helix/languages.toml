@@ -1,12 +1,39 @@
-[language-server.texlab.config.texlab.build]
-onSave = true
+
+[language-server.lsp-ai]
+command = "lsp-ai"
+environment = { LSP_AI_LOG = "info" }
+
+
+[language-server.lsp-ai.config.memory]
+file_store = { }
+
+[language-server.lsp-ai.config.models.model1]
+type = "open_ai"
+#chat_endpoint = "http://localhost:8000/v1/chat/completions"
+completions_endpoint = "http://localhost:8000/v1/completions"
+model =  "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
+auth_token = ""
+
+
+[language-server.lsp-ai.config.completion]
+model = "model1"
+
+[language-server.lsp-ai.config.completion.parameters]
+context = 2048
+max_tokens = 128
+temperature = 0.6
 
 [[language]]
 name = "rust"
 auto-format = true
+language-servers = [ "rust-analyzer", "lsp-ai" ]
+
+[language-server.rust-analyzer.config.check]
+command = "clippy"
+args = ["--all-targets", "--all-features", "--", "-D", "warnings"]
 
 [language-server.rust-analyzer.config.cargo]
 features = "all"
 
-[language-server.rust-analyzer.config.check]
-command = "clippy"
+[language-server.clangd]
+command = "clangd-19"
