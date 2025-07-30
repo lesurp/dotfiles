@@ -42,8 +42,11 @@ def --wrapped dotconf [...args: string] {
 alias g = git
 alias h = hx
 
-const git_compl_path = "~/.dotfiles/install/nu_scripts/custom-completions/git/git-completions.nu"
-source (if ($git_compl_path | path exists) { $git_compl_path } else { null })
+const compl = "~/.dotfiles/install/nu_scripts/custom-completions/"
+source (if ($compl | path exists) { $"($compl)/git/git-completions.nu" } else { null })
+source (if ($compl | path exists) { $"($compl)/cargo/cargo-completions.nu" } else { null })
+source (if ($compl | path exists) { $"($compl)/rg/rg-completions.nu" } else { null })
+source (if ($compl | path exists) { $"($compl)/zoxide/zoxide-completions.nu" } else { null })
 
 const panache_git_path = "~/.dotfiles/install/nu_scripts/modules/prompt/panache-git.nu"
 use (if ($panache_git_path | path exists) { $panache_git_path} else { null }) main
