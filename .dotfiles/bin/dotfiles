@@ -181,7 +181,7 @@ install_helix() {
        --path helix-term \
        --locked
 
-    HELIX_RUNTIME=$DOTFILES_INSTALL_DIR/helix
+    HELIX_RUNTIME=$DOTFILES_INSTALL_DIR/helix/runtime
 
     append_config HELIX_RUNTIME
     append_config DOTFILES_HELIX_DIR
