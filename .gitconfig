@@ -9,6 +9,9 @@
     lg-light-bg = log --graph --abbrev-commit --decorate --format=format:'%C(bold green)%h%C(reset) - %C(bold cyan)(%ar)%C(reset) %C(black)%s%C(reset) %C(dim black)- %an%C(reset)%C(auto)%d%C(reset)'
     lg-dark-bg = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)'
 
+    find-merge = "!sh -c 'commit=$0 && branch=${1:-HEAD} && (git rev-list $commit..$branch --ancestry-path | cat -n; git rev-list $commit..$branch --first-parent | cat -n) | sort -k2 -s | uniq -f1 -d | sort -n | tail -1 | cut -f2'"
+    show-merge = "!sh -c 'merge=$(git find-merge $0 $1) && [ -n \"$merge\" ] && git show $merge'"
+
 [branch]
     sort = committerdate
 
@@ -23,7 +26,7 @@
     algorithm = histogram
 
 [difftool "diffmerge"]
-    cmd = "nvim -d $LOCAL $REMOTE"
+    cmd = "vim -d $LOCAL $REMOTE"
 
 [fetch]
     prune = true
@@ -57,7 +60,7 @@
 	keepBackup = false
 
 [mergetool "mergetool"]
-    cmd = nvim -d $MERGED
+    cmd = vim -d $MERGED
 
 [rebase]
     autostash = true
