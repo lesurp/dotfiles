@@ -8,3 +8,10 @@ true-color = true
 
 [keys.normal]
 ";" = "command_mode"
+
+[editor.whitespace.render]
+space = "none"
+tab = "all"
+nbsp = "all"
+nnbsp = "all"
+newline = "all"

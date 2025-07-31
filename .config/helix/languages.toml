@@ -1,8 +1,16 @@
+### typst
+[[language]]
+name = "typst"
+language-servers = ["tinymist"]
 
+[language-server.tinymist]
+command = "tinymist"
+config = { exportPdf = "onType" }
+
+### lsp-ai
 [language-server.lsp-ai]
 command = "lsp-ai"
 environment = { LSP_AI_LOG = "info" }
-
 
 [language-server.lsp-ai.config.memory]
 file_store = { }
@@ -14,7 +22,6 @@ completions_endpoint = "http://localhost:8000/v1/completions"
 model =  "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
 auth_token = ""
 
-
 [language-server.lsp-ai.config.completion]
 model = "model1"
 
@@ -23,6 +30,8 @@ context = 2048
 max_tokens = 128
 temperature = 0.6
 
+
+### rust
 [[language]]
 name = "rust"
 auto-format = true
@@ -35,5 +44,18 @@ args = ["--all-targets", "--all-features", "--", "-D", "warnings"]
 [language-server.rust-analyzer.config.cargo]
 features = "all"
 
+
+### c++
 [language-server.clangd]
 command = "clangd-19"
+
+### python
+[[language]]
+name = "python"
+auto-format = true
+language-servers = ["pylsp"]
+
+[language-server.pylsp.config.pylsp]
+plugins.ruff.enabled = true
+plugins.pylsp_mypy.enabled = true
+plugins.pylsp_mypy.live_mode = true

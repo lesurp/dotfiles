@@ -49,10 +49,15 @@ source (if ($compl | path exists) { $"($compl)/rg/rg-completions.nu" } else { nu
 source (if ($compl | path exists) { $"($compl)/zoxide/zoxide-completions.nu" } else { null })
 
 const panache_git_path = "~/.dotfiles/install/nu_scripts/modules/prompt/panache-git.nu"
-use (if ($panache_git_path | path exists) { $panache_git_path} else { null }) main
+use (if ($panache_git_path | path exists) { $panache_git_path } else { null }) main
+$env.PROMPT_COMMAND = {|| panache-git }
+$env.PROMPT_INDICATOR = {|| $"(ansi reset)> "}
+$env.PROMPT_INDICATOR_VI_INSERT = {|| $"(ansi reset): " }
+$env.PROMPT_INDICATOR_VI_NORMAL = {|| $"(ansi reset)> " }
 
 $env.CMAKE_EXPORT_COMPILE_COMMANDS = 1
 $env.CMAKE_GENERATOR = "Ninja"
+$env.EDITOR = "hx"
 
 def git-lazycommit [] {
     for $it in (git ls-files --modified | split row "\n") {
