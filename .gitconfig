@@ -4,6 +4,8 @@
     s = status
     c = commit
     pull = pull --prune --all
+	pp = !"git pull --rebase && git push"
+	sw = switch
 
     lg = !"git lg-light-bg"
     lg-light-bg = log --graph --abbrev-commit --decorate --format=format:'%C(bold green)%h%C(reset) - %C(bold cyan)(%ar)%C(reset) %C(black)%s%C(reset) %C(dim black)- %an%C(reset)%C(auto)%d%C(reset)'
