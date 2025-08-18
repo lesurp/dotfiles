@@ -131,7 +131,7 @@ find_update_cmd() {
 
 find_install_cmd() {
     case $1 in
-        PACMAN) install_cmd="pacman -S --noconfirm"; return;;
+        PACMAN) install_cmd="pacman -S --needed --noconfirm"; return;;
         DPKG)   install_cmd="apt-get install -yq"; return;;
         YUM)    install_cmd="yum"; return;;
         ZYPPER) install_cmd="zypper"; return;;
