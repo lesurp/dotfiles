@@ -47,6 +47,7 @@ source (if ($compl | path exists) { $"($compl)/git/git-completions.nu" } else { 
 source (if ($compl | path exists) { $"($compl)/cargo/cargo-completions.nu" } else { null })
 source (if ($compl | path exists) { $"($compl)/rg/rg-completions.nu" } else { null })
 source (if ($compl | path exists) { $"($compl)/zoxide/zoxide-completions.nu" } else { null })
+source (if ("~/.zoxide.nu" | path exists) { "~/.zoxide.nu" } else { null })
 
 const panache_git_path = "~/.dotfiles/install/nu_scripts/modules/prompt/panache-git.nu"
 use (if ($panache_git_path | path exists) { $panache_git_path } else { null }) main
